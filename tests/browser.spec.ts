@@ -16,7 +16,7 @@ test('consumer branch, switching, three-choice cap, language persistence and sav
  await page.locator('#question-Q10 .answer-option').first().click();await page.locator('#question-Q11 label').nth(3).click();await page.locator('#question-Q12 .answer-option').first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
  await page.getByRole('tab',{name:'العربية'}).click();await expect(page.locator('html')).toHaveAttribute('dir','rtl');await page.getByRole('tab',{name:'FR',exact:true}).click();
  await page.locator('#question-Q13 .answer-option').first().click();await page.locator('#question-Q14 .answer-option').nth(1).click();await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();
- await page.getByRole('button',{name:'Enregistrer l’entretien',exact:true}).click();await expect(page.getByRole('heading',{name:'Entretien enregistré.'})).toBeVisible();
+ await page.getByRole('button',{name:'Enregistrer l’entretien',exact:true}).click();await expect(page.getByRole('heading',{name:'Entretien enregistré.'})).toBeVisible();await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow','100');
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('jti-pulse-records-v1')!));expect(saved).toHaveLength(1);expect(saved[0].answers.Q8).toHaveLength(3);expect(saved[0].answers.Q7b).toBe('2');expect(saved[0].answers.Q7a).toBeUndefined();
  await page.reload();await page.getByRole('button',{name:/Entretiens locaux/}).click();await expect(page.locator('.record-row')).toHaveCount(1);await page.locator('.record-row').click();await expect(page.locator('.review-section')).toHaveCount(9);
 });
@@ -28,5 +28,22 @@ test('retailer eighteen-SKU stock grid and capped substitution route',async({pag
  await page.locator('#question-R7 .answer-option').last().click();await expect(page.locator('.substitution-row')).toHaveCount(8);for(let i=0;i<8;i++)await page.locator('.substitution-row').nth(i).locator('select').first().selectOption('none');await page.getByRole('button',{name:'Continuer',exact:true}).click();
  await page.locator('#question-R9 .answer-option').nth(2).click();await page.getByRole('button',{name:'Continuer',exact:true}).click();await expect(page.locator('#question-R10')).toHaveCount(0);
  for(const id of ['R16','R17'])await page.locator(`#question-${id} .answer-option`).first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();await page.locator('#question-R18 .answer-option').first().click();await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await page.getByRole('button',{name:'Enregistrer l’entretien',exact:true}).click();
- await expect(page.getByRole('heading',{name:'Entretien enregistré.'})).toBeVisible();const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('jti-pulse-records-v1')!));expect(Object.keys(saved[0].answers.R8)).toHaveLength(8);expect(saved[0].answers.R10).toBeUndefined();
+ await expect(page.getByRole('heading',{name:'Entretien enregistré.'})).toBeVisible();await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow','100');const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('jti-pulse-records-v1')!));expect(Object.keys(saved[0].answers.R8)).toHaveLength(8);expect(saved[0].answers.R10).toBeUndefined();
+});
+
+test('mobile stepper stays visible, adapts to branches and supports RTL',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto(base);await page.locator('.eligibility input').check();await page.getByRole('button',{name:'Commencer l’entretien',exact:true}).click();
+ const steps=page.locator('.survey-stepper li');const initial=await steps.count();
+ await expect(page.locator('.survey-stepper [aria-current=step]')).toHaveCount(1);
+ await expect(page.locator('.survey-stepper button').nth(1)).toBeDisabled();
+ await page.locator('#question-Q1').getByText('MBO Red',{exact:true}).click();await page.locator('#question-Q2 .answer-option').filter({hasText:'Paquet et unité'}).click();
+ await expect(steps).toHaveCount(initial+1);await page.getByRole('button',{name:'Continuer',exact:true}).click();
+ await expect(page.locator('.survey-stepper [aria-current=step]')).toHaveAttribute('aria-label',/2\./);
+ await page.locator('.survey-stepper button').first().click();await expect(page.locator('#question-Q1')).toBeVisible();
+ await page.evaluate(()=>scrollTo(0,700));
+ const header=await page.locator('.sticky-header').boundingBox();expect(header?.y).toBe(0);
+ await page.getByRole('tab',{name:'العربية'}).click();await expect(page.locator('html')).toHaveAttribute('dir','rtl');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow',/^[1-9]\d?$/);
 });

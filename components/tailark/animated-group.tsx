@@ -1,6 +1,6 @@
 'use client'
-import React, { type ReactNode } from 'react'
-import { LazyMotion, domAnimation, m, type Variants } from 'motion/react'
+import React, { useMemo, type ReactNode } from 'react'
+import { LazyMotion, domAnimation, m, useReducedMotion, type Variants } from 'motion/react'
 
 export type PresetType = 'fade' | 'slide' | 'scale' | 'blur' | 'blur-slide' | 'zoom' | 'flip' | 'bounce' | 'rotate' | 'swing'
 
@@ -97,14 +97,15 @@ function AnimatedGroup({ children, className, variants, preset, as = 'div', asCh
     const containerVariants = variants?.container || selectedVariants.container
     const itemVariants = variants?.item || selectedVariants.item
 
-    const MotionComponent = m.create(as as keyof React.JSX.IntrinsicElements)
+    const reducedMotion = useReducedMotion()
+    const MotionComponent = useMemo(() => m.create(as as keyof React.JSX.IntrinsicElements), [as])
 
-    const MotionChild = m.create(asChild as keyof React.JSX.IntrinsicElements)
+    const MotionChild = useMemo(() => m.create(asChild as keyof React.JSX.IntrinsicElements), [asChild])
 
     return (
         <LazyMotion features={domAnimation}>
         <MotionComponent
-            initial="hidden"
+            initial={reducedMotion ? false : "hidden"}
             animate="visible"
             variants={containerVariants}
             className={className}>

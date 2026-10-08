@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "ux-writing-arabic": {
+      "source": "itady74/ux-writing-arabic",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "c366b60f342dd8a61c66cb86598b8f65db3e851ad047c3699c84c2959450b24a"
+    }
+  }
+}

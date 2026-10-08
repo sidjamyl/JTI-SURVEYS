@@ -1,6 +1,6 @@
 # JTI — Algeria Retail Pulse
 
-Application Next.js / React / TypeScript, avec Tailwind CSS, shadcn/ui, Animated Tabs de Smooth UI, Animated Group de Tailark et Paper Shaders. Interface française, anglaise et arabe, avec RTL, polices locales, navigation clavier et mouvements réduits.
+Application Next.js / React / TypeScript, avec Tailwind CSS, shadcn/ui, Animated Tabs de Smooth UI, Animated Group de Tailark. Interface française, anglaise et arabe, avec RTL, polices locales, navigation clavier et mouvements réduits.
 
 ## Démarrage
 
@@ -40,7 +40,7 @@ Source : `Algeria_OOS_Questionnaire_Workbook V1.xlsx`, fourni dans la conversati
 
 ## Sauvegarde et exports
 
-Les brouillons et entretiens sont stockés dans le navigateur sur cet appareil. Aucun serveur de collecte, accès équipe ou transfert à JTI n’est configuré. L’interface explique ce fonctionnement. Les exports JSON conservent l’ensemble des réponses ; le CSV est normalisé en une ligne par question / élément de grille et protège les cellules contre l’exécution de formules. Vider les données du navigateur supprime ces entretiens : exporter avant.
+Les brouillons et entretiens sont stockés dans le navigateur sur cet appareil. Aucun serveur de collecte, accès équipe ou transfert à JTI n’est configuré. Un libellé discret indique la sauvegarde sur cet appareil. Les exports JSON conservent l’ensemble des réponses ; le CSV est normalisé en une ligne par question / élément de grille et protège les cellules contre l’exécution de formules. Vider les données du navigateur supprime ces entretiens : exporter avant.
 
 ## Photos produit
 
@@ -77,6 +77,6 @@ Les noms commerciaux affichés sont ceux du classement du classeur (orthographe 
 
 Vert #00BB31, noir #101111, blanc et blanc cassé #F6F5F0. La palette contemporaine est référencée sur [Brandfetch JTI](https://brandfetch.com/jti.com). La page [JTI Afrique du Nord et de l’Ouest](https://www.jti.com/en/our-company/where-we-operate/northern-western-africa) est la référence utilisateur ; son téléchargement direct a présenté un checkpoint de sécurité. Le mot-symbole actuel est typographique, sans fichier de logo officiel fourni.
 
-La référence Monad fournie inspire les titres éditoriaux, le rythme et les boutons. Les fontes propriétaires non fournies sont remplacées par Instrument Serif, DM Sans et Noto Sans Arabic, distribuées via Google Fonts. Les recommandations consultées proviennent de Ponytail, Arabic Design, UX Writing Arabic, UI UX Pro Max, Codebase Design de Matt Pocock et Impeccable (passe de finition).
+La demande de simplification privilégie des titres sans empattements, deux choix de parcours et un stepper fixe. Les polices locales sont Manrope et Noto Sans Arabic, distribuées via Google Fonts. Le skill `ux-writing-arabic` du dépôt demandé est installé dans `.agents/skills/ux-writing-arabic`. Les recommandations consultées proviennent de Ponytail, Arabic Design, UX Writing Arabic, UI UX Pro Max, Codebase Design de Matt Pocock et Impeccable (passe de finition).
 
 Sources composants : [shadcn/ui](https://ui.shadcn.com/), [Smooth UI](https://smoothui.dev/r/animated-tabs.json), [Tailark](https://tailark.com/r/motion-primitives-animated-group.json), [Paper Shaders](https://github.com/paper-design/shaders). Les composants copiés conservent leur structure ; les tabs sont adaptés aux libellés accessibles et au clavier RTL.
