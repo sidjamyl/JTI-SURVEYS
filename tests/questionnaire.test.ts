@@ -7,6 +7,7 @@ test('consumer routing follows purchase, format and substitution answers',()=>{
  const a:Answers={Q1:skus[0].id,Q2:'both',Q5:'other-stick',Q6b:skus[1].id,Q7:'stick'};
  const ids=()=>activeSections('consumer',a).flatMap(s=>s.questions.map(q=>q.id));
  assert.ok(ids().includes('Q2b'));assert.ok(ids().includes('Q7a'));assert.ok(!ids().includes('Q7b'));assert.ok(ids().includes('Q8'));assert.ok(ids().includes('Q11'));assert.ok(ids().includes('Q12'));
+ a.Q7='both';assert.ok(ids().includes('Q7a'));assert.ok(ids().includes('Q7b'));
  a.Q5='later';assert.ok(!ids().includes('Q6b'));assert.ok(!ids().includes('Q7a'));assert.ok(!ids().includes('Q8'));assert.ok(!ids().includes('Q11'));assert.ok(ids().includes('Q9'));
  a.Q5='intended';a.Q6b=a.Q1;a.Q7='pack';a.Q2='pack';assert.ok(!ids().includes('Q2b'));assert.ok(!ids().includes('Q8'));assert.ok(ids().includes('Q7b'));
 });
@@ -17,6 +18,7 @@ test('retailer substitution is capped at eight SKUs in sales rank order',()=>{
  a.R3=Object.fromEntries(skus.map(s=>[s.id,'full']));assert.ok(!ids().includes('R8'));
 });
 test('validation enforces integer bounds, three-answer maximum and specified Other',()=>{
+ assert.ok(questionValid(question('Q7b'),{Q7b:'10'}));assert.ok(!questionValid(question('Q7b'),{Q7b:'11'}));
  assert.ok(questionValid(question('Q7a'),{Q7a:'15'}));for(const v of ['0','16','1.5','1e1',''])assert.ok(!questionValid(question('Q7a'),{Q7a:v}));
  assert.ok(!questionValid(question('Q8'),{Q8:['only','closest','cheaper','taste']}));assert.ok(questionValid(question('Q8'),{Q8:['only','taste','trust']}));assert.ok(!questionValid(question('Q8'),{Q8:['trust','trust']}));
  assert.ok(!questionValid(question('Q2b'),{Q2b:'other'}));assert.ok(questionValid(question('Q2b'),{Q2b:'other','Q2b-other':'Occasion particulière'}));
@@ -24,8 +26,8 @@ test('validation enforces integer bounds, three-answer maximum and specified Oth
 test('availability grid requires all eighteen valid statuses',()=>{
  const a:Answers={R3:Object.fromEntries(skus.map(s=>[s.id,'full']))};assert.ok(questionValid(question('R3'),a));delete (a.R3 as Record<string,string>)[skus[17].id];assert.ok(!questionValid(question('R3'),a));
 });
-test('routed substitute allows lost sales, rejects self-substitution and duplicate second choice',()=>{
- const a:Answers={R3:{[skus[0].id]:'out'},R8:{[skus[0].id]:'none'}};assert.ok(questionValid(question('R8'),a));a.R8={[skus[0].id]:skus[0].id};assert.ok(!questionValid(question('R8'),a));a.R8={[skus[0].id]:skus[1].id,[skus[0].id+'-second']:skus[1].id};assert.ok(!questionValid(question('R8'),a));a.R8={[skus[0].id]:'other'};assert.ok(!questionValid(question('R8'),a));a.R8={[skus[0].id]:'other',[skus[0].id+'-other']:'Specified brand'};assert.ok(questionValid(question('R8'),a));
+test('routed substitute includes the full SKU list and lost sales, rejects duplicate second choice',()=>{
+ const a:Answers={R3:{[skus[0].id]:'out'},R8:{[skus[0].id]:'none'}};assert.ok(questionValid(question('R8'),a));a.R8={[skus[0].id]:skus[0].id};assert.ok(questionValid(question('R8'),a));a.R8={[skus[0].id]:skus[1].id,[skus[0].id+'-second']:skus[1].id};assert.ok(!questionValid(question('R8'),a));a.R8={[skus[0].id]:'other'};assert.ok(!questionValid(question('R8'),a));a.R8={[skus[0].id]:'other',[skus[0].id+'-other']:'Specified brand'};assert.ok(questionValid(question('R8'),a));
 });
 test('exports omit stale conditional answers after edits',()=>{
  const a:Answers={Q1:skus[0].id,Q2:'pack',Q2b:'other','Q2b-other':'Stale',Q5:'later',Q6b:skus[1].id,Q7:'both',Q7a:'2',Q7b:'1',Q8:['trust'],Q11:'4',Q12:['price']};const cleaned=cleanAnswers('consumer',a);
@@ -38,4 +40,24 @@ test('CSV preserves Arabic and quotes text while neutralizing spreadsheet formul
 });
 test('all question and option translations are present in three languages',()=>{
  for(const q of [...consumerSections,...retailerSections].flatMap(s=>s.questions))for(const lang of ['fr','en','ar'] as const){assert.ok(q.text[lang].trim());for(const o of q.options??[])assert.ok(o.label[lang].trim());}
+});
+
+test('question codes, choice counts and SKU ranks match the original workbook',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const fixture=JSON.parse(await readFile(new URL('./fixtures/questionnaire.json',import.meta.url),'utf8'));
+ for(const [mode,sections] of [['consumer',consumerSections],['retailer',retailerSections]] as const){
+  const questions=sections.flatMap(s=>s.questions);
+  assert.deepEqual(questions.map(q=>q.id).sort(),fixture[mode].map((q:{id:string})=>q.id).sort());
+  for(const q of fixture[mode])if(q.choiceCount)assert.equal(questions.find(x=>x.id===q.id)?.options?.length,q.choiceCount,q.id);
+ }
+ const normalized=(name:string)=>name.replace('Filsters','Filters').trim();
+ assert.deepEqual(skus.map(s=>s.name),fixture.skus.map(normalized));
+});
+
+test('substitution export removes stale Other text while preserving an active second Other',()=>{
+ const sku=skus[0].id;
+ const a:Answers={R3:{[sku]:'out'},R8:{[sku]:'none',[sku+'-other']:'Stale text'}};
+ assert.deepEqual(cleanAnswers('retailer',a).R8,{[sku]:'none'});
+ (a.R8 as Record<string,string>)[sku+'-second']='other';
+ assert.deepEqual(cleanAnswers('retailer',a).R8,{[sku]:'none',[sku+'-second']:'other',[sku+'-other']:'Stale text'});
 });

@@ -10,7 +10,7 @@ export type Section = { id: string; title: Text; description: Text; questions: Q
 const o = (id: string, fr: string, en: string, ar: string): Option => ({ id, label: t(fr, en, ar) });
 export const skus = [
  ['mbo-red','Marlboro','MBO Red','#b52029'], ['gauloises-blue','Gauloises','Gauloises Blondes Blue','#223a7b'], ['lm-red','L&M','L&M Red Label','#b72230'], ['winston-red','Winston','Winston Filters Red','#ca3e36'], ['mbo-gold','Marlboro','MBO Gold','#b2985c'], ['ld-red','LD','LD Red','#9f2632'], ['pm-blue','Philip Morris','Philip Morris Blue','#2c4265'], ['lucky-original','Lucky Strike','Lucky Strike Original','#af2430'], ['business-royals','Business Royals','Business Royals SS','#244e37'], ['pm-silver','Philip Morris','Philip Morris Silver','#9b9e9c'], ['nassim','Nassim','Nassim','#253d71'], ['camel-yellow','Camel','Camel Filters Yellow','#bd9a32'], ['rym','Rym','Rym FF','#9a423b'], ['esse','Esse','Esse Edge 5Mg','#2689aa'], ['hp-silver','H&P','H&P Silver NDP','#959993'], ['mbo-beyond','Marlboro','MBO Beyond','#ab4550'], ['ld-club','LD','LD Club Red','#a82030'], ['rothmans','Rothmans','Rothman Signature','#9a2531'],
-].map(([id,brand,name,color], index) => ({ id, brand, name, color, rank: index + 1, image: `/products/${id}.jpg` }));
+].map(([id,brand,name,color], index) => ({ id, brand, name, color, rank: index + 1 }));
 export const formats = [o('pack','Paquet entier','Full pack','علبة كاملة'),o('stick','À l’unité','Stick','بالسيجارة'),o('both','Paquet et unité','Both pack and stick','علبة وسيجارة')];
 export const stockOptions = [o('full','Disponible','Fully available','متوفر'),o('stick','À l’unité seulement','Available only by stick','بالسيجارة فقط'),o('out','En rupture','Out of stock','غير متوفر'),o('not-sold','Non vendu ici','Not sold here','لا يُباع هنا'),o('unknown','Ne sait pas','Don’t know','لا أعرف')];
 const other = o('other','Autre, à préciser','Other, specify','غير ذلك، حدّد');
@@ -73,7 +73,7 @@ export const retailerSections: Section[] = [
  ]),
  section('substitution',t('Les alternatives','Substitutions','البدائل'),t('Ce que les consommateurs choisissent en cas de rupture.','What consumers choose when stock is disrupted.','ما يختاره المستهلكون عند عدم توفر المنتج.'),[
   q('R7',t('Que se passe-t-il généralement lorsqu’une marque n’est pas disponible ?','When a consumer asks for an unavailable brand, what usually happens?','ماذا يحدث عادة عندما يطلب المستهلك علامة غير متوفرة؟'),[o('brand','Ils achètent une autre marque ici','They buy another brand in this POS','يشترون علامة أخرى من هنا'),o('sku','Ils achètent une autre référence de la même marque','They buy another SKU from the same brand','يشترون منتجًا آخر من العلامة نفسها'),o('stick','Ils achètent à l’unité','They buy by stick instead','يشترون بالسيجارة'),o('leave','Ils partent chercher ailleurs','They leave to search elsewhere','يغادرون للبحث في مكان آخر'),o('none','Ils n’achètent rien','They do not buy','لا يشترون شيئًا')]),
-  {id:'R8',text:t('Vers quel produit se tournent-ils pour ces références indisponibles ?','For the SKUs flagged out of stock or stick-only, which product do consumers most often switch to?','إلى أي منتج ينتقل المستهلكون عند عدم توفر هذه المنتجات؟'),type:'substitution',when:a=>flaggedSkus(a).length>0},
+  {id:'R8',text:t('Quel produit choisissent-ils le plus souvent quand ces références sont indisponibles ?','For the SKUs flagged out of stock or stick-only, which product do consumers most often switch to?','إلى أي منتج ينتقل المستهلكون غالبًا عند عدم توفر هذه المنتجات؟'),type:'substitution',when:a=>flaggedSkus(a).length>0},
  ]),
  section('recommendation',t('Votre recommandation','Your recommendation','توصيتك'),t('Votre rôle dans le choix d’une alternative.','Your role in choosing an alternative.','دورك في اختيار البديل.'),[
   q('R9',t('Recommandez-vous habituellement une alternative ?','Do you usually recommend an alternative when the requested brand is unavailable?','هل توصي عادة ببديل عندما لا تتوفر العلامة المطلوبة؟'),[o('always','Oui, toujours','Yes, always','نعم، دائمًا'),o('sometimes','Oui, parfois','Yes, sometimes','نعم، أحيانًا'),o('decides','Non, le consommateur décide','No, consumer decides','لا، المستهلك يقرر'),o('no','Non, j’annonce simplement l’indisponibilité','No, I just say it is unavailable','لا، أكتفي بإبلاغه بعدم توفرها')]),
@@ -98,7 +98,7 @@ export function questionValid(q: Question, a: Answers): boolean {
  if(q.type==='context') { const v=value as Record<string,string>;return !!v && ['wilaya','city','pos'].every(k=>typeof v[k]==='string'&&v[k].trim().length>0); }
  if(q.type==='stock') { const v=value as Record<string,string>;return !!v&&skus.every(s=>stockOptions.some(o=>o.id===v[s.id])); }
  if(q.type==='substitution') { const v=value as Record<string,string>;return !!v&&flaggedSkus(a).every(s=>{
-  const primary=v[s.id],second=v[s.id+'-second']; const valid=(x:string)=>skus.some(p=>p.id===x&&p.id!==s.id)||['other','none'].includes(x);
+  const primary=v[s.id],second=v[s.id+'-second']; const valid=(x:string)=>skus.some(p=>p.id===x)||['other','none'].includes(x);
   return valid(primary)&&(!second||(valid(second)&&second!==primary))&& (![primary,second].includes('other')||!!v[s.id+'-other']?.trim());
  }); }
  if(q.type==='number') return typeof value==='string' && /^\d+$/.test(value)&&Number(value)>=(q.min??1)&&Number(value)<=(q.max??Infinity);
@@ -113,7 +113,7 @@ export function questionValid(q: Question, a: Answers): boolean {
 export function cleanAnswers(mode:Mode,a:Answers):Answers {
  const cleaned:Answers={};
  for(const s of activeSections(mode,a))for(const q of s.questions) {
-  if(q.id==='R8') {const grid=a.R8 as Record<string,string>;const v:Record<string,string>={};for(const sku of flaggedSkus(a))for(const suffix of ['','-second','-other'])if(grid?.[sku.id+suffix])v[sku.id+suffix]=grid[sku.id+suffix];cleaned.R8=v;}
+  if(q.id==='R8') {const grid=a.R8 as Record<string,string>;const v:Record<string,string>={};for(const sku of flaggedSkus(a))for(const suffix of ['','-second','-other'])if(grid?.[sku.id+suffix]&&(suffix!=='-other'||[grid[sku.id],grid[sku.id+'-second']].includes('other')))v[sku.id+suffix]=grid[sku.id+suffix];cleaned.R8=v;}
   else {cleaned[q.id]=a[q.id];const value=a[q.id];if(value==='other'||(Array.isArray(value)&&value.includes('other')))cleaned[q.id+'-other']=a[q.id+'-other'];}
  }
  return cleaned;

@@ -1,0 +1,199 @@
+{
+  "source": "Algeria_OOS_Questionnaire_Workbook V1.xlsx",
+  "consumer": [
+    {
+      "id": "Q1",
+      "type": "Single answer (coded list)",
+      "routing": ""
+    },
+    {
+      "id": "Q2",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 3
+    },
+    {
+      "id": "Q2b",
+      "type": "Single answer",
+      "routing": "only if Q2 is both",
+      "choiceCount": 3
+    },
+    {
+      "id": "Q3",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 3
+    },
+    {
+      "id": "Q4",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 8
+    },
+    {
+      "id": "Q5",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 8
+    },
+    {
+      "id": "Q6b",
+      "type": "Single answer (coded list)",
+      "routing": "Ask only if purchased"
+    },
+    {
+      "id": "Q7",
+      "type": "Single answer",
+      "routing": "Ask only if purchased",
+      "choiceCount": 3
+    },
+    {
+      "id": "Q7a",
+      "type": "Numeric",
+      "routing": "only if Q7 is stick or both"
+    },
+    {
+      "id": "Q7b",
+      "type": "Numeric",
+      "routing": "only if Q7 is pack or both"
+    },
+    {
+      "id": "Q8",
+      "type": "Multiple answer (max 3)",
+      "routing": "Ask if did not buy intended product (if Q6b is different from Q1)",
+      "choiceCount": 10
+    },
+    {
+      "id": "Q9",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 5
+    },
+    {
+      "id": "Q10",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 5
+    },
+    {
+      "id": "Q11",
+      "type": "Scale 1-5",
+      "routing": "Ask if switched"
+    },
+    {
+      "id": "Q12",
+      "type": "Multiple answer",
+      "routing": "Ask if switched",
+      "choiceCount": 8
+    },
+    {
+      "id": "Q13",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 2
+    },
+    {
+      "id": "Q14",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 4
+    }
+  ],
+  "retailer": [
+    {
+      "id": "R1",
+      "type": "Auto-filled",
+      "routing": ""
+    },
+    {
+      "id": "R2",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 4
+    },
+    {
+      "id": "R3",
+      "type": "Grid — single answer per row",
+      "routing": "Ask retailer or complete by BA observation where possible. Drives routing for R8 below."
+    },
+    {
+      "id": "R4",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 5
+    },
+    {
+      "id": "R5",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 5
+    },
+    {
+      "id": "R6",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 6
+    },
+    {
+      "id": "R7",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 5
+    },
+    {
+      "id": "R8",
+      "type": "Routed grid — single-select dropdown per row (+ optional 2nd choice)",
+      "routing": "Only asks about SKUs the respondent already flagged as OOS/limited in R3 (skip logic). Hard cap of 8 rows per respondent even if more SKUs were flagged, to protect LOI."
+    },
+    {
+      "id": "R9",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 4
+    },
+    {
+      "id": "R10",
+      "type": "Single answer",
+      "routing": "Ask if recommends",
+      "choiceCount": 8
+    },
+    {
+      "id": "R16",
+      "type": "Single answer",
+      "routing": "",
+      "choiceCount": 6
+    },
+    {
+      "id": "R17",
+      "type": "Multiple answer",
+      "routing": "",
+      "choiceCount": 8
+    },
+    {
+      "id": "R18",
+      "type": "Multiple answer",
+      "routing": "",
+      "choiceCount": 8
+    }
+  ],
+  "skus": [
+    "MBO Red",
+    "Gauloises Blondes Blue",
+    "L&M Red Label",
+    "Winston Filsters Red",
+    "MBO Gold",
+    "LD Red",
+    "Philip Morris Blue",
+    "Lucky Strike Original",
+    "Business Royals SS",
+    "Philip Morris Silver",
+    "Nassim",
+    "Camel Filters Yellow",
+    "Rym FF",
+    "Esse Edge 5Mg",
+    "H&P Silver NDP",
+    "MBO Beyond",
+    "LD Club Red",
+    "Rothman Signature"
+  ]
+}

@@ -75,7 +75,7 @@ export function SurveyApp() {
   <div className="workspace">
    <div className="sticky-header">
     <header className="topbar">
-     <button className="brand" onClick={()=>navigate('home')} aria-label={`JTI — ${c('home')}`}><span className="wordmark">jti<span>•</span></span><span className="brand-name">Retail Pulse</span></button>
+     <button className="brand" onClick={()=>navigate('home')} aria-label={`JTI — ${c('home')}`}><span className="brand-logo"><img src="/brand/jti-logo.png" alt="JTI" width={1335} height={1214}/></span><span className="brand-name">Retail Pulse</span></button>
      <nav className="main-nav" aria-label={c('fieldwork')}><button className={['home','survey','review','success'].includes(view)?'active':''} onClick={()=>navigate('home')}><Plus size={16}/><span>{c('interview')}</span></button><button className={['records','record'].includes(view)?'active':''} onClick={()=>navigate('records')}><FolderOpen size={16}/><span>{c('records')}</span><span className="nav-count">{records.length}</span></button></nav>
      <AnimatedTabs ariaLabel={t('Langue','Language','اللغة')[lang]} layoutId="language" activeTab={lang} variant="pill" tabs={[{id:'fr',label:'FR'},{id:'en',label:'EN'},{id:'ar',label:'العربية'}]} onChange={v=>setLang(v as Language)} className="language-tabs"/>
     </header>

@@ -1,1 +1,20 @@
-{}
+{
+  "mbo-red": "/products/mbo-red.jpg",
+  "mbo-beyond": "/products/mbo-beyond.jpg",
+  "mbo-gold": "/products/mbo-gold.jpg",
+  "gauloises-blue": "/products/gauloises-blue.jpg",
+  "lm-red": "/products/lm-red.jpg",
+  "rym": "/products/rym.jpg",
+  "winston-red": "/products/winston-red.jpg",
+  "pm-blue": "/products/pm-blue.jpg",
+  "pm-silver": "/products/pm-silver.jpg",
+  "ld-red": "/products/ld-red.jpg",
+  "ld-club": "/products/ld-club.jpg",
+  "lucky-original": "/products/lucky-original.jpg",
+  "camel-yellow": "/products/camel-yellow.jpg",
+  "nassim": "/products/nassim.jpg",
+  "business-royals": "/products/business-royals.jpg",
+  "esse": "/products/esse.jpg",
+  "hp-silver": "/products/hp-silver.jpg",
+  "rothmans": "/products/rothmans.jpg"
+}

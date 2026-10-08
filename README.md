@@ -44,9 +44,9 @@ Les brouillons et entretiens sont stockés dans le navigateur sur cet appareil. 
 
 ## Photos produit
 
-Les 18 photos étaient visibles dans la conversation, mais les fichiers annoncés sur `C:/Users/ASUS/Downloads` ne sont pas présents dans le système de fichiers accessible. Aucun packaging fictif n’a été substitué.
+Le logo et les 18 photos fournis via Drive sont intégrés localement dans `public/brand/` et `public/products/`. Le formulaire ne dépend pas de Drive à l’exécution. Le logo original est affiché sans les marges vides de son fichier, via CSS.
 
-Ajouter les photos dans `public/products/` et remplir `public/products/images.json` avec les identifiants suivants :
+Le manifeste `public/products/images.json` associe les photos aux identifiants suivants :
 
 | Identifiant | Photo fournie |
 | --- | --- |
@@ -75,8 +75,18 @@ Les noms commerciaux affichés sont ceux du classement du classeur (orthographe 
 
 ## Direction visuelle et références
 
-Vert #00BB31, noir #101111, blanc et blanc cassé #F6F5F0. La palette contemporaine est référencée sur [Brandfetch JTI](https://brandfetch.com/jti.com). La page [JTI Afrique du Nord et de l’Ouest](https://www.jti.com/en/our-company/where-we-operate/northern-western-africa) est la référence utilisateur ; son téléchargement direct a présenté un checkpoint de sécurité. Le mot-symbole actuel est typographique, sans fichier de logo officiel fourni.
+Vert #00BB31, noir #101111, blanc et blanc cassé #F6F5F0. La palette contemporaine est référencée sur [Brandfetch JTI](https://brandfetch.com/jti.com). La page [JTI Afrique du Nord et de l’Ouest](https://www.jti.com/en/our-company/where-we-operate/northern-western-africa) est la référence utilisateur ; son téléchargement direct a présenté un checkpoint de sécurité. Le logo est celui fourni par l’utilisateur dans le dossier Drive.
 
 La demande de simplification privilégie des titres sans empattements, deux choix de parcours et un stepper fixe. Les polices locales sont Manrope et Noto Sans Arabic, distribuées via Google Fonts. Le skill `ux-writing-arabic` du dépôt demandé est installé dans `.agents/skills/ux-writing-arabic`. Les recommandations consultées proviennent de Ponytail, Arabic Design, UX Writing Arabic, UI UX Pro Max, Codebase Design de Matt Pocock et Impeccable (passe de finition).
 
-Sources composants : [shadcn/ui](https://ui.shadcn.com/), [Smooth UI](https://smoothui.dev/r/animated-tabs.json), [Tailark](https://tailark.com/r/motion-primitives-animated-group.json), [Paper Shaders](https://github.com/paper-design/shaders). Les composants copiés conservent leur structure ; les tabs sont adaptés aux libellés accessibles et au clavier RTL.
+Sources composants : [shadcn/ui](https://ui.shadcn.com/), [Smooth UI](https://smoothui.dev/r/animated-tabs.json), [Tailark](https://tailark.com/r/motion-primitives-animated-group.json). Les composants copiés conservent leur structure ; les tabs sont adaptés aux libellés accessibles et au clavier RTL.
+
+## GitHub et Vercel
+
+Le projet Next.js est à la racine du dépôt GitHub `sidjamyl/JTI-SURVEYS` (le checkout local est dans `survey/`). Importer ce dépôt dans Vercel, framework Next.js, commande `npm run build`, sortie `out`. Ces réglages sont versionnés dans `vercel.json`. Aucun secret ni variable d’environnement n’est nécessaire au formulaire statique.
+
+Le changement de domaine ne transfère pas les entretiens : le stockage du navigateur est propre à chaque origine. Exporter les entretiens de l’ancien site avant de changer d’adresse.
+
+## Vérification du questionnaire
+
+`tests/fixtures/questionnaire.json` est extrait du classeur source : 17 questions consommateur, 13 questions détaillant, 18 références ordonnées. Les tests vérifient les codes, le nombre de choix, les routages, les limites numériques, les exports et les trois langues. Voir `AUDIT.md` pour les points du classeur qui restent à confirmer.

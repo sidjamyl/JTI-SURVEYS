@@ -8,4 +8,4 @@
 - Mobile : numéros reliés et intitulé de l’étape active ; aucun défilement horizontal. Le stepper reste visible pendant le défilement.
 - Microcopy arabe : skill `itady74/ux-writing-arabic`, verbes directs et messages courts. Conserver le sens des questions et les erreurs utiles.
 - Mouvement : apparition discrète des choix avec Tailark, changement de langue avec Smooth UI ; respect du mouvement réduit.
-- Les photos attendent les fichiers utilisateur ; aucun pack reconstitué.
+- Logo JTI et 18 photos utilisateur servis localement ; les paquets sont affichés sans recadrage. Aucun pack reconstitué.
