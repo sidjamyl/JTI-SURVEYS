@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
+test.skip(!!process.env.SURVEY_TEST_MODE,'Dedicated branch uses branch.spec.ts');
 const base=process.env.SURVEY_TEST_URL || 'http://localhost:3002';
 test('consumer branch, switching, three-choice cap, language persistence and saved interview',async({page})=>{
+ await page.addInitScript(()=>{const w=window as typeof window & {nativeCalls:[string,string][]};w.nativeCalls=[];w.WL={Execute:(name,json)=>w.nativeCalls.push([name,json])};});
  await page.goto(base);await expect(page.getByRole('button',{name:'Commencer l’entretien',exact:true})).toBeEnabled();
  await page.getByRole('button',{name:'Commencer l’entretien',exact:true}).click();await expect(page.locator('.field-error[role=alert]')).toContainText('Confirmez');
  await page.locator('.eligibility input').check();await page.getByRole('button',{name:'Commencer l’entretien',exact:true}).click();
@@ -17,6 +19,7 @@ test('consumer branch, switching, three-choice cap, language persistence and sav
  await page.getByRole('tab',{name:'العربية'}).click();await expect(page.locator('html')).toHaveAttribute('dir','rtl');await page.getByRole('tab',{name:'FR',exact:true}).click();
  await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();
  await page.getByRole('button',{name:'Enregistrer l’entretien',exact:true}).click();await expect(page.getByRole('heading',{name:'Entretien enregistré.'})).toBeVisible();await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow','100');
+ const native=await page.evaluate(()=>({calls:(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls,pulled:window.reponse?.()}));expect(native.calls).toHaveLength(1);expect(native.calls[0][0]).toBe('Reponse');expect(native.pulled).toBe(native.calls[0][1]);expect(JSON.parse(native.pulled!).answers.Q2.language).toBe('en');
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('jti-pulse-records-v1')!));expect(saved).toHaveLength(1);expect(saved[0].answers.Q8).toHaveLength(3);expect(saved[0].answers.Q7b).toBe('2');expect(saved[0].answers.Q7a).toBeUndefined();expect(saved[0].answers.Q13).toBeUndefined();expect(saved[0].answers.Q14).toBeUndefined();expect(saved[0].questionLanguages.Q1).toBe('fr');expect(saved[0].questionLanguages.Q2).toBe('en');
  const downloadPromise=page.waitForEvent('download');await page.locator('.success-actions button').first().click();const download=await downloadPromise;const {readFile}=await import('node:fs/promises');const exported=JSON.parse(await readFile((await download.path())!,'utf8'));expect(exported[0].answers.Q2).toMatchObject({answer:'Both pack and stick',language:'en'});
  await page.reload();await page.getByRole('button',{name:/Entretiens locaux/}).click();await expect(page.locator('.record-row')).toHaveCount(1);await page.locator('.record-row').click();await expect(page.locator('.review-section')).toHaveCount(8);

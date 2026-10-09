@@ -35,8 +35,12 @@ export function literalAnswers(mode:Mode,answers:Answers,languages:QuestionLangu
   return [q.id,{question:q.text[lang],answer,language}];
  }));
 }
+export function interviewPayload(r:Interview) {
+ const {questionLanguages,...record}=r;
+ return {...record,answers:literalAnswers(r.mode,r.answers,questionLanguages,r.language)};
+}
 export function interviewsJson(records:Interview[]) {
- return JSON.stringify(records.map(r=>({...r,questionLanguages:undefined,answers:literalAnswers(r.mode,r.answers,r.questionLanguages,r.language)})),null,2);
+ return JSON.stringify(records.map(interviewPayload),null,2);
 }
 export function interviewsCsv(records:Interview[]) {
  const rows=[['interview_id','mode','language','completed_at','question_code','item','answer']];

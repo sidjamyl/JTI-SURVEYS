@@ -96,3 +96,7 @@ Le changement de domaine ne transfère pas les entretiens : le stockage du navig
 Le workflow `.github/workflows/pages.yml` compile et publie automatiquement `main` sur GitHub Pages. `NEXT_PUBLIC_BASE_PATH` est défini au build Pages à partir du sous-chemin du dépôt ; il reste vide pour Vercel et pour le développement local. Les scripts Next.js, les polices, le logo et les photos utilisent ce sous-chemin.
 
 Les tests navigateur acceptent `SURVEY_TEST_URL` pour vérifier la version déployée.
+
+## Versions dédiées et WinDev Mobile
+
+Les branches `consumer` et `retailer` ouvrent directement leur formulaire, avec un Dockerfile complet pour Dokploy. Le pont reprend `WL.Execute` du dépôt Camel : à la validation finale, `Reponse(json)` reçoit un entretien avec les réponses en clair et leur langue. `window.reponse()` permet aussi la lecture depuis WinDev. Voir [le flow WinDev](docs/WINDEV.md), [les réglages Dokploy](docs/DOKPLOY.md) et [un exemple JSON](docs/example-response.json).

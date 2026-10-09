@@ -39,6 +39,8 @@ export const copy = {
  none:t('Aucun substitut / repart sans achat','No clear substitute / leaves without buying','لا بديل واضح / يغادر دون شراء'),
  flagged:t('Uniquement les références en rupture ou disponibles à l’unité. Maximum 8, par ordre de priorité.','Only out-of-stock or stick-only variants. Up to 8, in sales rank order.','المنتجات غير المتوفرة أو المتوفرة بالسيجارة فقط. حتى 8 حسب ترتيب المبيعات.'),
  photoPending:t('Photo à ajouter','Photo pending','الصورة غير متاحة'),
+ bridgeError:t('Enregistré sur cet appareil. Transmission à l’application indisponible.','Saved on this device. Transfer to the app is unavailable.','حُفظت المقابلة على هذا الجهاز. تعذّر إرسالها إلى التطبيق.'),
+ retry:t('Réessayer l’envoi','Retry sending','أعد محاولة الإرسال'),
  success:t('Entretien enregistré.','Interview saved.','تم حفظ المقابلة.'),
  export:t('Exporter les entretiens','Export interviews','صدّر المقابلات'),
  exportDraft:t('Exporter le brouillon','Export draft','صدّر المسودة'),

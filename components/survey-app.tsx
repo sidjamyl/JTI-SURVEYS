@@ -12,20 +12,24 @@ import { t } from '@/lib/questionnaire';
 import { activeSections, cleanAnswers, questionValid, skus, stockOptions, type Answers, type Answer, type Language, type Mode, type Question } from '@/lib/questionnaire';
 import { DRAFT_KEY, DRAFT_LANGUAGE_KEY, RECORD_KEY, download, interviewsCsv, interviewsJson, literalAnswers, isAnswers, isInterview, isQuestionLanguages, type QuestionLanguages, type Interview } from '@/lib/storage';
 
+import { fixedMode } from '@/lib/deployment';
+import { initializeResponse, publishResponse } from '@/lib/windev';
+
 type View='home'|'survey'|'review'|'success'|'records'|'record';
 export function SurveyApp() {
  const [lang,setLang]=useState<Language>('fr');
- const [mode,setMode]=useState<Mode>('consumer');
- const [view,setView]=useState<View>('home');
+ const [mode,setMode]=useState<Mode>(fixedMode??'consumer');
+ const [view,setView]=useState<View>(fixedMode?'survey':'home');
  const [drafts,setDrafts]=useState<Record<Mode,Answers>>({consumer:{},retailer:{}});
  const [questionLanguages,setQuestionLanguages]=useState<Record<Mode,QuestionLanguages>>({consumer:{},retailer:{}});
- const [activeId,setActiveId]=useState('intention');
+ const [activeId,setActiveId]=useState(fixedMode==='retailer'?'context':'intention');
  const [eligible,setEligible]=useState(false);
  const [gateError,setGateError]=useState(false);
  const [invalid,setInvalid]=useState<string[]>([]);
  const [records,setRecords]=useState<Interview[]>([]);
  const [selectedRecord,setSelectedRecord]=useState<Interview|null>(null);
  const [storageOk,setStorageOk]=useState(true);
+ const [bridgeError,setBridgeError]=useState(false);
  const [ready,setReady]=useState(false);
  const heading=useRef<HTMLHeadingElement>(null);
  const c=(key:keyof typeof copy)=>copy[key][lang];
@@ -35,6 +39,7 @@ export function SurveyApp() {
  const current=sections[sectionIndex];
  const dateFormat=new Intl.DateTimeFormat(lang==='ar'?'ar-DZ':lang==='fr'?'fr-FR':'en-GB',{dateStyle:'medium',timeStyle:'short'});
  useEffect(()=>{
+  initializeResponse();
   try {
    const rawDrafts=localStorage.getItem(DRAFT_KEY);const rawRecords=localStorage.getItem(RECORD_KEY);
    if(rawDrafts){const d=JSON.parse(rawDrafts);if(!isAnswers(d.consumer)||!isAnswers(d.retailer))throw new Error('Invalid draft');setDrafts(d);}
@@ -47,14 +52,15 @@ export function SurveyApp() {
  useEffect(()=>{if(ready&&storageOk)try{localStorage.setItem(DRAFT_KEY,JSON.stringify(drafts));localStorage.setItem(DRAFT_LANGUAGE_KEY,JSON.stringify(questionLanguages));}catch{setStorageOk(false);}},[drafts,questionLanguages,ready,storageOk]);
  useEffect(()=>{if(view==='survey'||view==='review'||view==='success'){window.scrollTo({top:0,behavior:'instant'});heading.current?.focus();}},[activeId,view]);
  const setAnswer=(id:string,value:Answer)=>{setDrafts(d=>({...d,[mode]:{...d[mode],[id]:value}}));setQuestionLanguages(l=>({...l,[mode]:{...l[mode],[id.replace('-other','')]:lang}}));setInvalid(v=>v.filter(x=>x!==id&&x!==id.replace('-other','')));};
- const navigate=(v:View)=>{setView(v);setInvalid([]);};
+ const navigate=(v:View)=>{setView(fixedMode&&v==='home'?'survey':v);if(fixedMode&&v==='home')setActiveId(activeSections(mode,a)[0].id);setInvalid([]);};
  const start=()=>{if(mode==='consumer'&&!eligible){setGateError(true);return;}setActiveId(sections.find(s=>s.questions.some(q=>!questionValid(q,a)))?.id??sections[0].id);navigate('survey');};
- const next=()=>{const bad=current.questions.filter(q=>!questionValid(q,a)).map(q=>q.id);setInvalid(bad);if(bad.length){document.getElementById(`question-${bad[0]}`)?.scrollIntoView({behavior:'smooth',block:'center'});return;}if(sectionIndex<sections.length-1)setActiveId(sections[sectionIndex+1].id);else navigate('review');};
+ const next=()=>{if(mode==='consumer'&&!eligible){setGateError(true);return;}const bad=current.questions.filter(q=>!questionValid(q,a)).map(q=>q.id);setInvalid(bad);if(bad.length){document.getElementById(`question-${bad[0]}`)?.scrollIntoView({behavior:'smooth',block:'center'});return;}if(sectionIndex<sections.length-1)setActiveId(sections[sectionIndex+1].id);else navigate('review');};
  const save=()=>{
+  if(mode==='consumer'&&!eligible){setGateError(true);setActiveId(sections[0].id);setView('survey');return;}
   const bad=sections.find(s=>s.questions.some(q=>!questionValid(q,a)));
   if(bad){setActiveId(bad.id);setInvalid(bad.questions.filter(q=>!questionValid(q,a)).map(q=>q.id));setView('survey');return;}
   const record:Interview={id:crypto.randomUUID(),mode,language:lang,completedAt:new Date().toISOString(),answers:cleanAnswers(mode,a),questionLanguages:questionLanguages[mode],schemaVersion:1};
-  try {if(!storageOk)throw new Error('Storage unavailable');const latestRaw=localStorage.getItem(RECORD_KEY);const latest=latestRaw?JSON.parse(latestRaw):[];if(!Array.isArray(latest)||!latest.every(isInterview))throw new Error('Invalid records');const updated=[record,...latest];localStorage.setItem(RECORD_KEY,JSON.stringify(updated));setRecords(updated);setSelectedRecord(record);setDrafts(d=>({...d,[mode]:{}}));setQuestionLanguages(l=>({...l,[mode]:{}}));navigate('success');}
+  try {if(!storageOk)throw new Error('Storage unavailable');const latestRaw=localStorage.getItem(RECORD_KEY);const latest=latestRaw?JSON.parse(latestRaw):[];if(!Array.isArray(latest)||!latest.every(isInterview))throw new Error('Invalid records');const updated=[record,...latest];localStorage.setItem(RECORD_KEY,JSON.stringify(updated));setRecords(updated);setSelectedRecord(record);setDrafts(d=>({...d,[mode]:{}}));setQuestionLanguages(l=>({...l,[mode]:{}}));navigate('success');setBridgeError(!publishResponse(record));}
   catch{setStorageOk(false);}
  };
  const exportRecords=(format:'json'|'csv')=>download(`jti-algeria-interviews.${format}`,format==='json'?interviewsJson(records):interviewsCsv(records),format==='json'?'application/json':'text/csv;charset=utf-8');
@@ -84,15 +90,15 @@ export function SurveyApp() {
     {['survey','review','success'].includes(view)&&<SurveyStepper sections={view==='success'&&selectedRecord?activeSections(mode,selectedRecord.answers):sections} answers={view==='success'&&selectedRecord?selectedRecord.answers:a} lang={lang} activeId={view==='survey'?current.id:'review'} finished={view==='success'} onSelect={id=>{if(id==='review')navigate('review');else{setActiveId(id);navigate('survey');}}}/>}
    </div>
    <main id="main" role="tabpanel" aria-labelledby={`language-tab-${lang}`} className={`main-content ${view==='survey'?'survey-content':''}`}>
-    {view==='home'&&<>
+    {view==='home'&&!fixedMode&&<>
      <section className="start-section"><h1>{c('interview')}</h1><AnimatedGroup preset="fade" className="mode-cards">{(['consumer','retailer'] as Mode[]).map(m=>{const Icon=m==='consumer'?Users:Store;return <button key={m} className={`mode-card ${mode===m?'chosen':''}`} onClick={()=>{setMode(m);setGateError(false);}} aria-pressed={mode===m}><span className="mode-icon"><Icon size={24} strokeWidth={1.5}/></span><div className="mode-title"><h2>{c(m)}</h2><span><bdi>{m==='consumer'?'3–5':'4–6'}</bdi> {c('minutes')}</span></div><span className="mode-radio">{mode===m&&<Check size={13}/>}</span></button>;})}</AnimatedGroup>
       {mode==='consumer'&&<label className={`eligibility ${gateError?'invalid':''}`}><input type="checkbox" checked={eligible} onChange={e=>{setEligible(e.target.checked);setGateError(false);}}/><span>{c('gate')}</span></label>}{gateError&&<p className="field-error" role="alert">{c('eligibility')}</p>}
       <div className="start-footer"><Button size="lg" className="primary-button" disabled={!ready} onClick={start}>{Object.keys(a).length?c('resume'):c('start')}<ArrowRight className="directional" size={18}/></Button></div>
      </section>
     </>}
-    {view==='survey'&&<><div className="survey-heading"><h1 tabIndex={-1} ref={heading}>{current.title[lang]}</h1></div><div className="form-sheet"><form onSubmit={e=>{e.preventDefault();next();}} noValidate>{current.questions.map(q=><QuestionField key={q.id} question={q} answers={a} lang={lang} set={setAnswer} invalid={invalid.includes(q.id)}/>)}<div className="form-navigation"><Button type="button" variant="ghost" onClick={()=>{if(sectionIndex)setActiveId(sections[sectionIndex-1].id);else navigate('home');setInvalid([]);}}><ArrowLeft className="directional"/>{c('back')}</Button><Button type="submit" size="lg" className="primary-button">{sectionIndex===sections.length-1?c('review'):c('next')}<ArrowRight className="directional"/></Button></div></form></div><button className="draft-export" onClick={exportDraft}><Download size={14}/>{c('exportDraft')}</button></>}
+    {view==='survey'&&<><div className="survey-heading"><h1 tabIndex={-1} ref={heading}>{current.title[lang]}</h1></div><div className="form-sheet"><form onSubmit={e=>{e.preventDefault();next();}} noValidate>{fixedMode==='consumer'&&sectionIndex===0&&<div className="question"><label className={`eligibility ${gateError?'invalid':''}`}><input type="checkbox" checked={eligible} onChange={e=>{setEligible(e.target.checked);setGateError(false);}}/><span>{c('gate')}</span></label>{gateError&&<p className="field-error" role="alert">{c('eligibility')}</p>}</div>}{current.questions.map(q=><QuestionField key={q.id} question={q} answers={a} lang={lang} set={setAnswer} invalid={invalid.includes(q.id)}/>)}<div className="form-navigation"><Button type="button" variant="ghost" onClick={()=>{if(sectionIndex)setActiveId(sections[sectionIndex-1].id);else navigate('home');setInvalid([]);}}><ArrowLeft className="directional"/>{c('back')}</Button><Button type="submit" size="lg" className="primary-button" disabled={!ready}>{sectionIndex===sections.length-1?c('review'):c('next')}<ArrowRight className="directional"/></Button></div></form></div><button className="draft-export" onClick={exportDraft}><Download size={14}/>{c('exportDraft')}</button></>}
     {(view==='review'||view==='record')&&<><div className="survey-heading"><h1 ref={heading} tabIndex={-1}>{c('review')}</h1>{view==='record'&&selectedRecord&&<p>{dateFormat.format(new Date(selectedRecord.completedAt))}</p>}</div><div className="review-sections">{shownSections.map(s=><section className="review-section" key={s.id}><header><h2>{s.title[lang]}</h2>{view==='review'&&<Button variant="ghost" onClick={()=>{setActiveId(s.id);navigate('survey');}}>{c('edit')}<ArrowUpRight size={14}/></Button>}</header>{s.questions.map(q=><div className="review-row" key={q.id}><div><span className="review-code">{q.id}</span><p>{q.text[lang]}</p></div><div>{summary(q,shownAnswers)}</div></div>)}</section>)}</div><div className="review-footer"><Button variant="outline" onClick={()=>navigate(view==='record'?'records':'survey')}><ArrowLeft className="directional"/>{c('back')}</Button>{view==='review'&&<Button className="primary-button" size="lg" onClick={save} disabled={!storageOk}>{c('save')}<Check size={17}/></Button>}</div>{!storageOk&&<Button variant="outline" onClick={exportDraft}>{c('exportDraft')}<Download size={16}/></Button>}</>}
-    {view==='success'&&<div className="success-panel"><span className="success-icon"><Check strokeWidth={1.5} size={38}/></span><h1 ref={heading} tabIndex={-1}>{c('success')}</h1>{selectedRecord&&<div className="receipt"><span>{c(mode)}</span><bdi>{selectedRecord.id.slice(0,8).toUpperCase()}</bdi><span>{dateFormat.format(new Date(selectedRecord.completedAt))}</span></div>}<div className="success-actions"><Button variant="outline" onClick={()=>exportRecords('json')}><Download size={16}/>{c('export')}</Button><Button className="primary-button" onClick={()=>{setEligible(false);navigate('home');}}>{c('new')}<Plus size={16}/></Button></div></div>}
+    {view==='success'&&<div className="success-panel"><span className="success-icon"><Check strokeWidth={1.5} size={38}/></span><h1 ref={heading} tabIndex={-1}>{c('success')}</h1>{selectedRecord&&<div className="receipt"><span>{c(mode)}</span><bdi>{selectedRecord.id.slice(0,8).toUpperCase()}</bdi><span>{dateFormat.format(new Date(selectedRecord.completedAt))}</span></div>}{bridgeError&&<div role="alert"><p>{c('bridgeError')}</p><Button variant="outline" onClick={()=>{if(selectedRecord)setBridgeError(!publishResponse(selectedRecord));}}>{c('retry')}</Button></div>}<div className="success-actions"><Button variant="outline" onClick={()=>exportRecords('json')}><Download size={16}/>{c('export')}</Button><Button className="primary-button" onClick={()=>{setEligible(false);setBridgeError(false);initializeResponse();navigate('home');}}>{c('new')}<Plus size={16}/></Button></div></div>}
     {view==='records'&&<><div className="section-heading records-heading"><div><h1>{c('records')}</h1><p>{records.length} {c('recorded')}</p></div>{records.length>0&&<div className="export-buttons"><Button variant="outline" onClick={()=>exportRecords('csv')}><Download size={15}/>CSV</Button><Button className="primary-button" onClick={()=>exportRecords('json')}><Download size={15}/>JSON</Button></div>}</div>{records.length?<div className="records-list">{records.map(r=><button key={r.id} className="record-row" onClick={()=>{setSelectedRecord(r);navigate('record');}}><span className="record-icon">{r.mode==='consumer'?<Users size={19}/>:<Store size={19}/>}</span><div><strong>{c(r.mode)}</strong><span>{dateFormat.format(new Date(r.completedAt))}</span></div><bdi className="record-id">{r.id.slice(0,8).toUpperCase()}</bdi><span className="complete-tag"><Check size={12}/>{c('completed')}</span><ArrowUpRight size={18}/></button>)}</div>:<div className="empty-state"><ClipboardList size={42} strokeWidth={1}/><h2>{c('empty')}</h2><Button className="primary-button" onClick={()=>navigate('home')}>{c('start')}<ArrowRight className="directional"/></Button></div>}</>}
     {!storageOk&&<div className="storage-alert" role="alert"><ShieldCheck size={18}/><span>{c('localError')}</span><button onClick={exportDraft}>{c('exportDraft')}</button></div>}
     {storageOk&&<footer className="page-footer"><ShieldCheck size={14}/><span>{c('localShort')}</span></footer>}

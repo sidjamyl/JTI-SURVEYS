@@ -1,0 +1,44 @@
+{
+  "id": "8a205d0a-3530-4a8b-b898-af966b9d81c2",
+  "mode": "consumer",
+  "language": "fr",
+  "completedAt": "2026-10-09T11:00:00.000Z",
+  "schemaVersion": 1,
+  "answers": {
+    "Q1": {
+      "question": "Quel produit aviez-vous l’intention d’acheter ?",
+      "answer": "MBO Red",
+      "language": "fr"
+    },
+    "Q2": {
+      "question": "What format do you usually buy with your main SKU?",
+      "answer": "Full pack",
+      "language": "en"
+    },
+    "Q3": {
+      "question": "Le produit recherché était-il disponible ?",
+      "answer": "Non, ni par paquet ni à l’unité",
+      "language": "fr"
+    },
+    "Q4": {
+      "question": "Que s’est-il passé lorsque vous l’avez demandé ?",
+      "answer": "Le détaillant a annoncé une rupture",
+      "language": "fr"
+    },
+    "Q5": {
+      "question": "Qu’avez-vous finalement fait ?",
+      "answer": "J’achèterai plus tard",
+      "language": "fr"
+    },
+    "Q9": {
+      "question": "Comment avez-vous fait ce choix ?",
+      "answer": "Il y avait peu d’options",
+      "language": "fr"
+    },
+    "Q10": {
+      "question": "Si votre produit habituel revient, que ferez-vous probablement ?",
+      "answer": "Revenir à mon produit habituel",
+      "language": "fr"
+    }
+  }
+}
