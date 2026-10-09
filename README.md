@@ -90,3 +90,9 @@ Le changement de domaine ne transfère pas les entretiens : le stockage du navig
 ## Vérification du questionnaire
 
 `tests/fixtures/questionnaire.json` est extrait du classeur source : 17 questions consommateur, 13 questions détaillant, 18 références ordonnées. Les tests vérifient les codes, le nombre de choix, les routages, les limites numériques, les exports et les trois langues. Voir `AUDIT.md` pour les points du classeur qui restent à confirmer.
+
+## GitHub Pages
+
+Le workflow `.github/workflows/pages.yml` compile et publie automatiquement `main` sur GitHub Pages. `NEXT_PUBLIC_BASE_PATH` est défini au build Pages à partir du sous-chemin du dépôt ; il reste vide pour Vercel et pour le développement local. Les scripts Next.js, les polices, le logo et les photos utilisent ce sous-chemin.
+
+Les tests navigateur acceptent `SURVEY_TEST_URL` pour vérifier la version déployée.

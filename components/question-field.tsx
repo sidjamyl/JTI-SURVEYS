@@ -8,7 +8,7 @@ export function ProductVisual({id,small=false,lang}:{id:string;small?:boolean;la
  const sku=skus.find(s=>s.id===id)!;
  const [missing,setMissing]=useState(!(productImages as Record<string,string>)[id]);
  return <div className={`product-visual ${small?'small':''}`} style={{'--product-color':sku.color} as React.CSSProperties}>
-  {!missing && <img src={(productImages as Record<string,string>)[id]} alt={sku.name} onError={()=>setMissing(true)} loading="lazy" />}
+  {!missing && <img src={(process.env.NEXT_PUBLIC_BASE_PATH || '')+(productImages as Record<string,string>)[id]} alt={sku.name} onError={()=>setMissing(true)} loading="lazy" />}
   {missing && <><Package size={small?19:27} strokeWidth={1}/>{!small&&<span>{copy.photoPending[lang]}</span>}</>}
  </div>;
 }

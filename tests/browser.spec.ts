@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-const base='http://localhost:3002';
+const base=process.env.SURVEY_TEST_URL || 'http://localhost:3002';
 test('consumer branch, switching, three-choice cap, language persistence and saved interview',async({page})=>{
  await page.goto(base);await expect(page.getByRole('button',{name:'Commencer l’entretien',exact:true})).toBeEnabled();
  await page.getByRole('button',{name:'Commencer l’entretien',exact:true}).click();await expect(page.locator('.field-error[role=alert]')).toContainText('Confirmez');
@@ -50,6 +50,7 @@ test('mobile stepper stays visible, adapts to branches and supports RTL',async({
 
 test('supplied logo and eighteen photos load in all three languages',async({page})=>{
  await page.goto(base);await expect(page.locator('.brand-logo img')).toBeVisible();
+ await expect.poll(()=>page.evaluate(()=>[...document.fonts].some(font=>font.family==='Manrope'&&font.status==='loaded'))).toBe(true);
  expect(await page.locator('.brand-logo img').evaluate((img:HTMLImageElement)=>img.complete&&img.naturalWidth>0)).toBe(true);
  await page.locator('.eligibility input').check();await page.getByRole('button',{name:'Commencer l’entretien',exact:true}).click();
  const images=page.locator('#question-Q1 .product-visual img');await expect(images).toHaveCount(18);
@@ -58,6 +59,7 @@ test('supplied logo and eighteen photos load in all three languages',async({page
  }
  for(const language of ['EN','العربية','FR']){
   await page.getByRole('tab',{name:language,exact:true}).click();await expect(images).toHaveCount(18);
+  if(language==='العربية')await expect.poll(()=>page.evaluate(()=>[...document.fonts].some(font=>font.family==='Noto Sans Arabic'&&font.status==='loaded'))).toBe(true);
  }
 });
 
