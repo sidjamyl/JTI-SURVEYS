@@ -13,7 +13,7 @@ import { activeSections, cleanAnswers, questionValid, skus, stockOptions, type A
 import { DRAFT_KEY, DRAFT_LANGUAGE_KEY, RECORD_KEY, download, interviewsCsv, interviewsJson, literalAnswers, isAnswers, isInterview, isQuestionLanguages, type QuestionLanguages, type Interview } from '@/lib/storage';
 
 import { fixedMode } from '@/lib/deployment';
-import { initializeResponse, publishResponse } from '@/lib/windev';
+import { publishResponse } from '@/lib/windev';
 
 type View='home'|'survey'|'review'|'success'|'records'|'record';
 export function SurveyApp() {
@@ -39,7 +39,6 @@ export function SurveyApp() {
  const current=sections[sectionIndex];
  const dateFormat=new Intl.DateTimeFormat(lang==='ar'?'ar-DZ':lang==='fr'?'fr-FR':'en-GB',{dateStyle:'medium',timeStyle:'short'});
  useEffect(()=>{
-  initializeResponse();
   try {
    const rawDrafts=localStorage.getItem(DRAFT_KEY);const rawRecords=localStorage.getItem(RECORD_KEY);
    if(rawDrafts){const d=JSON.parse(rawDrafts);if(!isAnswers(d.consumer)||!isAnswers(d.retailer))throw new Error('Invalid draft');setDrafts(d);}
@@ -52,7 +51,7 @@ export function SurveyApp() {
  useEffect(()=>{if(ready&&storageOk)try{localStorage.setItem(DRAFT_KEY,JSON.stringify(drafts));localStorage.setItem(DRAFT_LANGUAGE_KEY,JSON.stringify(questionLanguages));}catch{setStorageOk(false);}},[drafts,questionLanguages,ready,storageOk]);
  useEffect(()=>{if(view==='survey'||view==='review'||view==='success'){window.scrollTo({top:0,behavior:'instant'});heading.current?.focus();}},[activeId,view]);
  const setAnswer=(id:string,value:Answer)=>{setDrafts(d=>({...d,[mode]:{...d[mode],[id]:value}}));setQuestionLanguages(l=>({...l,[mode]:{...l[mode],[id.replace('-other','')]:lang}}));setInvalid(v=>v.filter(x=>x!==id&&x!==id.replace('-other','')));};
- const navigate=(v:View)=>{if(v==='home'){initializeResponse();setBridgeError(false);if(view==='success')setEligible(false);}setView(fixedMode&&v==='home'?'survey':v);if(fixedMode&&v==='home')setActiveId(activeSections(mode,a)[0].id);setInvalid([]);};
+ const navigate=(v:View)=>{if(v==='home'){setBridgeError(false);if(view==='success')setEligible(false);}setView(fixedMode&&v==='home'?'survey':v);if(fixedMode&&v==='home')setActiveId(activeSections(mode,a)[0].id);setInvalid([]);};
  const start=()=>{if(mode==='consumer'&&!eligible){setGateError(true);return;}setActiveId(sections.find(s=>s.questions.some(q=>!questionValid(q,a)))?.id??sections[0].id);navigate('survey');};
  const next=()=>{if(mode==='consumer'&&!eligible){setGateError(true);return;}const bad=current.questions.filter(q=>!questionValid(q,a)).map(q=>q.id);setInvalid(bad);if(bad.length){document.getElementById(`question-${bad[0]}`)?.scrollIntoView({behavior:'smooth',block:'center'});return;}if(sectionIndex<sections.length-1)setActiveId(sections[sectionIndex+1].id);else navigate('review');};
  const save=()=>{

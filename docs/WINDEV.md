@@ -28,19 +28,10 @@ Référence consultée : `sidjamyl/camel`, `app/lib/windev.ts`. Camel envoie `WL
 
 7. WinDev doit enregistrer durablement l'entretien et gérer son envoi métier. Le site n'appelle aucun serveur de collecte. Le simple retour de `WL.Execute` ne prouve pas que WinDev a sauvegardé les données.
 
-## Lecture demandée par WinDev
+## Même appel que Camel
 
-Le site expose aussi `window.reponse()` : elle renvoie la même chaîne JSON après validation finale, ou `null` avant celle-ci. WinDev peut l'évaluer dans le champ HTML avec `ExécuteJS`, en utilisant la procédure de récupération du résultat adaptée à votre version de WinDev Mobile.
-
-Autre façon de demander la réponse depuis WinDev, sans dépendre du type de retour d'`ExécuteJS` :
-
-```wlanguage
-ExécuteJS(HTM_Survey, "const json = window.reponse(); if (json !== null) WL.Execute('Reponse', json);")
-```
-
-Ce rappel provoque une nouvelle réception du même entretien : dédupliquer par `id`. La première transmission est automatique ; ce rappel est facultatif.
-
-`window.reponse()` ne lit pas un brouillon et ne termine pas un formulaire. La réponse est remise à `null` au nouvel entretien ou au rechargement de la page. Les entretiens enregistrés restent dans le stockage du navigateur et sont exportables depuis la liste.
+Camel appelle `WL.Execute("Score", score)`. JTI appelle `WL.Execute("Reponse", json)`.
+La procédure WinDev `Reponse(sJSON est une chaîne)` reçoit directement le JSON complet au clic sur « Enregistrer l'entretien ». Aucun appel `ExécuteJS` n'est nécessaire pour cette réception.
 
 ## JSON
 
@@ -59,6 +50,6 @@ Dans un navigateur ordinaire sans `WL`, le formulaire fonctionne et reste export
 
 La chaîne peut contenir de l'arabe, des guillemets et des retours ligne : transmettre le JSON tel quel à la procédure et utiliser `JSONVersVariant`, sans concaténer ses réponses dans du code JavaScript.
 
-Tests : pont simulé, conservation de `this` pour `WL`, rappel, échec, parcours navigateur. La version WinDev de votre application et les appareils Android/iOS ne sont pas accessibles ici ; valider un entretien réel dans le champ HTML avant terrain.
+Tests : pont simulé, conservation de `this` pour `WL`, envoi unique, échec et nouvelle tentative, parcours navigateur. La version WinDev de votre application et les appareils Android/iOS ne sont pas accessibles ici ; valider un entretien réel dans le champ HTML avant terrain.
 
 Documentation PC SOFT : [champ d'affichage HTML / WL.Execute](https://doc.pcsoft.fr/fr-FR/?1410087141=).
