@@ -1,5 +1,18 @@
 # Dokploy — deux services JTI Surveys
 
+## Installation sur ce VPS
+
+Le projet **JTI Surveys**, environnement **production**, est créé et déployé dans Dokploy avec deux applications.
+
+| Service | URL HTTPS temporaire | Branche |
+| --- | --- | --- |
+| consumer | https://jti-surveys-consumer-romd1a-8efbe1-169-58-156-78.sslip.io | `consumer` |
+| retailer | https://jti-surveys-retailer-klatnh-49454f-169-58-156-78.sslip.io | `retailer` |
+
+Les services utilisent le fournisseur Git public et le Dockerfile du dépôt. Pour publier une mise à jour, pousser sur la branche correspondante puis cliquer **Deploy** dans son application Dokploy ; aucun webhook automatique n’est configuré. Aucun compte, jeton ou clé API n’a été créé pour cette installation : les fonctions locales de Dokploy ont été appelées depuis son conteneur sur le VPS.
+
+Ces adresses générées par Dokploy peuvent être remplacées dans **Domains** par vos domaines métier. Le stockage navigateur est propre à chaque origine : exporter les entretiens avant un changement de domaine.
+
 ## Projet et services
 
 Créer le projet **JTI Surveys**, environnement **production**, puis deux applications :
