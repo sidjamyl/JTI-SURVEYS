@@ -10,7 +10,7 @@ import { QuestionField } from '@/components/question-field';
 import { copy } from '@/lib/copy';
 import { t } from '@/lib/questionnaire';
 import { activeSections, cleanAnswers, questionValid, skus, stockOptions, type Answers, type Answer, type Language, type Mode, type Question } from '@/lib/questionnaire';
-import { DRAFT_KEY, RECORD_KEY, download, interviewsCsv, isAnswers, isInterview, type Interview } from '@/lib/storage';
+import { DRAFT_KEY, DRAFT_LANGUAGE_KEY, RECORD_KEY, download, interviewsCsv, interviewsJson, literalAnswers, isAnswers, isInterview, isQuestionLanguages, type QuestionLanguages, type Interview } from '@/lib/storage';
 
 type View='home'|'survey'|'review'|'success'|'records'|'record';
 export function SurveyApp() {
@@ -18,6 +18,7 @@ export function SurveyApp() {
  const [mode,setMode]=useState<Mode>('consumer');
  const [view,setView]=useState<View>('home');
  const [drafts,setDrafts]=useState<Record<Mode,Answers>>({consumer:{},retailer:{}});
+ const [questionLanguages,setQuestionLanguages]=useState<Record<Mode,QuestionLanguages>>({consumer:{},retailer:{}});
  const [activeId,setActiveId]=useState('intention');
  const [eligible,setEligible]=useState(false);
  const [gateError,setGateError]=useState(false);
@@ -37,32 +38,33 @@ export function SurveyApp() {
   try {
    const rawDrafts=localStorage.getItem(DRAFT_KEY);const rawRecords=localStorage.getItem(RECORD_KEY);
    if(rawDrafts){const d=JSON.parse(rawDrafts);if(!isAnswers(d.consumer)||!isAnswers(d.retailer))throw new Error('Invalid draft');setDrafts(d);}
+   const rawLanguages=localStorage.getItem(DRAFT_LANGUAGE_KEY);if(rawLanguages){const l=JSON.parse(rawLanguages);if(!isQuestionLanguages(l.consumer)||!isQuestionLanguages(l.retailer))throw new Error('Invalid languages');setQuestionLanguages(l);}
    if(rawRecords){const r=JSON.parse(rawRecords);if(!Array.isArray(r)||!r.every(isInterview))throw new Error('Invalid records');setRecords(r);}
    const storedLanguage=localStorage.getItem('jti-pulse-language');if(['fr','en','ar'].includes(storedLanguage??''))setLang(storedLanguage as Language);
   }catch{setStorageOk(false);}finally{setReady(true);}
  },[]);
  useEffect(()=>{document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';if(ready&&storageOk)try{localStorage.setItem('jti-pulse-language',lang);}catch{setStorageOk(false);}},[lang,ready,storageOk]);
- useEffect(()=>{if(ready&&storageOk)try{localStorage.setItem(DRAFT_KEY,JSON.stringify(drafts));}catch{setStorageOk(false);}},[drafts,ready,storageOk]);
+ useEffect(()=>{if(ready&&storageOk)try{localStorage.setItem(DRAFT_KEY,JSON.stringify(drafts));localStorage.setItem(DRAFT_LANGUAGE_KEY,JSON.stringify(questionLanguages));}catch{setStorageOk(false);}},[drafts,questionLanguages,ready,storageOk]);
  useEffect(()=>{if(view==='survey'||view==='review'||view==='success'){window.scrollTo({top:0,behavior:'instant'});heading.current?.focus();}},[activeId,view]);
- const setAnswer=(id:string,value:Answer)=>{setDrafts(d=>({...d,[mode]:{...d[mode],[id]:value}}));setInvalid(v=>v.filter(x=>x!==id&&x!==id.replace('-other','')));};
+ const setAnswer=(id:string,value:Answer)=>{setDrafts(d=>({...d,[mode]:{...d[mode],[id]:value}}));setQuestionLanguages(l=>({...l,[mode]:{...l[mode],[id.replace('-other','')]:lang}}));setInvalid(v=>v.filter(x=>x!==id&&x!==id.replace('-other','')));};
  const navigate=(v:View)=>{setView(v);setInvalid([]);};
  const start=()=>{if(mode==='consumer'&&!eligible){setGateError(true);return;}setActiveId(sections.find(s=>s.questions.some(q=>!questionValid(q,a)))?.id??sections[0].id);navigate('survey');};
  const next=()=>{const bad=current.questions.filter(q=>!questionValid(q,a)).map(q=>q.id);setInvalid(bad);if(bad.length){document.getElementById(`question-${bad[0]}`)?.scrollIntoView({behavior:'smooth',block:'center'});return;}if(sectionIndex<sections.length-1)setActiveId(sections[sectionIndex+1].id);else navigate('review');};
  const save=()=>{
   const bad=sections.find(s=>s.questions.some(q=>!questionValid(q,a)));
   if(bad){setActiveId(bad.id);setInvalid(bad.questions.filter(q=>!questionValid(q,a)).map(q=>q.id));setView('survey');return;}
-  const record:Interview={id:crypto.randomUUID(),mode,language:lang,completedAt:new Date().toISOString(),answers:cleanAnswers(mode,a),schemaVersion:1};
-  try {if(!storageOk)throw new Error('Storage unavailable');const latestRaw=localStorage.getItem(RECORD_KEY);const latest=latestRaw?JSON.parse(latestRaw):[];if(!Array.isArray(latest)||!latest.every(isInterview))throw new Error('Invalid records');const updated=[record,...latest];localStorage.setItem(RECORD_KEY,JSON.stringify(updated));setRecords(updated);setSelectedRecord(record);setDrafts(d=>({...d,[mode]:{}}));navigate('success');}
+  const record:Interview={id:crypto.randomUUID(),mode,language:lang,completedAt:new Date().toISOString(),answers:cleanAnswers(mode,a),questionLanguages:questionLanguages[mode],schemaVersion:1};
+  try {if(!storageOk)throw new Error('Storage unavailable');const latestRaw=localStorage.getItem(RECORD_KEY);const latest=latestRaw?JSON.parse(latestRaw):[];if(!Array.isArray(latest)||!latest.every(isInterview))throw new Error('Invalid records');const updated=[record,...latest];localStorage.setItem(RECORD_KEY,JSON.stringify(updated));setRecords(updated);setSelectedRecord(record);setDrafts(d=>({...d,[mode]:{}}));setQuestionLanguages(l=>({...l,[mode]:{}}));navigate('success');}
   catch{setStorageOk(false);}
  };
- const exportRecords=(format:'json'|'csv')=>download(`jti-algeria-interviews.${format}`,format==='json'?JSON.stringify(records,null,2):interviewsCsv(records),format==='json'?'application/json':'text/csv;charset=utf-8');
- const exportDraft=()=>download('jti-algeria-draft.json',JSON.stringify({mode,language:lang,status:'draft',answers:a},null,2),'application/json');
+ const exportRecords=(format:'json'|'csv')=>download(`jti-algeria-interviews.${format}`,format==='json'?interviewsJson(records):interviewsCsv(records),format==='json'?'application/json':'text/csv;charset=utf-8');
+ const exportDraft=()=>download('jti-algeria-draft.json',JSON.stringify({mode,language:lang,status:'draft',answers:literalAnswers(mode,a,questionLanguages[mode],lang)},null,2),'application/json');
  const summary=(q:Question,answers:Answers):React.ReactNode=>{
   const v=answers[q.id];
   if(q.type==='sku')return <bdi>{skus.find(s=>s.id===v)?.name}</bdi>;
-  if(q.type==='stock'||q.type==='substitution'||q.type==='context')return <div className="review-grid">{Object.entries(v as Record<string,string>).filter(([,x])=>x).map(([key,val])=>{
+  if(q.type==='stock'||q.type==='substitution')return <div className="review-grid">{Object.entries(v as Record<string,string>).filter(([,x])=>x).map(([key,val])=>{
    const sku=skus.find(s=>s.id===key.replace(/-(second|other)$/,''));
-   const label=q.type==='context'?copy[key as 'wilaya'|'city'|'pos']?.[lang]:sku?.name+(key.endsWith('-second')?` · ${c('secondary')}`:key.endsWith('-other')?` · ${c('specify')}`:'');
+   const label=sku?.name+(key.endsWith('-second')?` · ${c('secondary')}`:key.endsWith('-other')?` · ${c('specify')}`:'');
    const display=q.type==='stock'?stockOptions.find(o=>o.id===val)?.label[lang]:q.type==='substitution'?(skus.find(s=>s.id===val)?.name??(val==='other'?c('otherBrand'):val==='none'?c('none'):val)):val;
    return <div key={key}><bdi>{label}</bdi><bdi>{display}</bdi></div>;
   })}</div>;

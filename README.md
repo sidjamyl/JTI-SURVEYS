@@ -36,11 +36,11 @@ Source : `Algeria_OOS_Questionnaire_Workbook V1.xlsx`, fourni dans la conversati
 - R3 : 18 statuts obligatoires. R8 : uniquement rupture ou unité, huit premières références selon le classement de ventes. « Aucun substitut / repart sans achat » est conservé ; deuxième choix facultatif et distinct du premier.
 - R10 : uniquement si R9 indique une recommandation.
 - Les réponses masquées après modification sont conservées dans le brouillon, puis exclues de l’entretien final.
-- R1 est saisi manuellement : aucune source d’identifiants POS n’a été fournie. La collecte automatique de ville/quartier/type POS mentionnée en note consommateur nécessite une source métier et n’est pas simulée.
+- À la demande utilisateur, Q13/Q14 (sexe et âge) et R1 (wilaya, ville, identifiant POS) sont retirés. R2 (type de point de vente) est conservé.
 
 ## Sauvegarde et exports
 
-Les brouillons et entretiens sont stockés dans le navigateur sur cet appareil. Aucun serveur de collecte, accès équipe ou transfert à JTI n’est configuré. Un libellé discret indique la sauvegarde sur cet appareil. Les exports JSON conservent l’ensemble des réponses ; le CSV est normalisé en une ligne par question / élément de grille et protège les cellules contre l’exécution de formules. Vider les données du navigateur supprime ces entretiens : exporter avant.
+Les brouillons et entretiens sont stockés dans le navigateur sur cet appareil. Aucun serveur de collecte, accès équipe ou transfert à JTI n’est configuré. Un libellé discret indique la sauvegarde sur cet appareil. Les exports JSON donnent pour chaque question son texte, la réponse en clair et la langue au dernier changement de cette réponse (`{question, answer, language}`). Changer la langue de l’interface ne modifie pas cette information. Les anciens brouillons et entretiens ont `language: null` par question, car leur historique de langue est inconnu ; leur langue globale sert à traduire les libellés. Les champs supprimés et les réponses conditionnelles masquées sont exclus du JSON. Les grilles utilisent les noms des produits et les choix multiples des tableaux de libellés ; le CSV est normalisé en une ligne par question / élément de grille et protège les cellules contre l’exécution de formules. Vider les données du navigateur supprime ces entretiens : exporter avant.
 
 ## Photos produit
 

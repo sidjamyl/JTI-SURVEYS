@@ -5,7 +5,7 @@ test('consumer branch, switching, three-choice cap, language persistence and sav
  await page.getByRole('button',{name:'Commencer l’entretien',exact:true}).click();await expect(page.locator('.field-error[role=alert]')).toContainText('Confirmez');
  await page.locator('.eligibility input').check();await page.getByRole('button',{name:'Commencer l’entretien',exact:true}).click();
  await page.getByRole('button',{name:'Continuer',exact:true}).click();await expect(page.locator('.field-error')).toHaveCount(2);
- await page.locator('#question-Q1').getByText('MBO Red',{exact:true}).click();await page.locator('#question-Q2 .answer-option').filter({hasText:'Paquet et unité'}).click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
+ await page.locator('#question-Q1').getByText('MBO Red',{exact:true}).click();await page.getByRole('tab',{name:'EN',exact:true}).click();await page.locator('#question-Q2 .answer-option').last().click();await page.getByRole('tab',{name:'FR',exact:true}).click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
  await expect(page.locator('#question-Q2b')).toBeVisible();await page.locator('#question-Q2b .answer-option').first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
  await page.locator('#question-Q3 .answer-option').last().click();await page.locator('#question-Q4 .answer-option').nth(1).click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
  await page.locator('#question-Q5 .answer-option').nth(2).click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
@@ -13,16 +13,17 @@ test('consumer branch, switching, three-choice cap, language persistence and sav
  await expect(page.locator('#question-Q7a')).toHaveCount(0);await page.locator('#question-Q7b input').fill('2');await page.getByRole('button',{name:'Continuer',exact:true}).click();
  for(let i=0;i<3;i++)await page.locator('#question-Q8 .answer-option').nth(i).click();await expect(page.locator('#question-Q8 input:disabled')).toHaveCount(7);
  await page.locator('#question-Q9 .answer-option').first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
- await page.locator('#question-Q10 .answer-option').first().click();await page.locator('#question-Q11 label').nth(3).click();await page.locator('#question-Q12 .answer-option').first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
+ await page.locator('#question-Q10 .answer-option').first().click();await page.locator('#question-Q11 label').nth(3).click();await page.locator('#question-Q12 .answer-option').first().click();
  await page.getByRole('tab',{name:'العربية'}).click();await expect(page.locator('html')).toHaveAttribute('dir','rtl');await page.getByRole('tab',{name:'FR',exact:true}).click();
- await page.locator('#question-Q13 .answer-option').first().click();await page.locator('#question-Q14 .answer-option').nth(1).click();await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();
+ await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();
  await page.getByRole('button',{name:'Enregistrer l’entretien',exact:true}).click();await expect(page.getByRole('heading',{name:'Entretien enregistré.'})).toBeVisible();await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow','100');
- const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('jti-pulse-records-v1')!));expect(saved).toHaveLength(1);expect(saved[0].answers.Q8).toHaveLength(3);expect(saved[0].answers.Q7b).toBe('2');expect(saved[0].answers.Q7a).toBeUndefined();
- await page.reload();await page.getByRole('button',{name:/Entretiens locaux/}).click();await expect(page.locator('.record-row')).toHaveCount(1);await page.locator('.record-row').click();await expect(page.locator('.review-section')).toHaveCount(9);
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('jti-pulse-records-v1')!));expect(saved).toHaveLength(1);expect(saved[0].answers.Q8).toHaveLength(3);expect(saved[0].answers.Q7b).toBe('2');expect(saved[0].answers.Q7a).toBeUndefined();expect(saved[0].answers.Q13).toBeUndefined();expect(saved[0].answers.Q14).toBeUndefined();expect(saved[0].questionLanguages.Q1).toBe('fr');expect(saved[0].questionLanguages.Q2).toBe('en');
+ const downloadPromise=page.waitForEvent('download');await page.locator('.success-actions button').first().click();const download=await downloadPromise;const {readFile}=await import('node:fs/promises');const exported=JSON.parse(await readFile((await download.path())!,'utf8'));expect(exported[0].answers.Q2).toMatchObject({answer:'Both pack and stick',language:'en'});
+ await page.reload();await page.getByRole('button',{name:/Entretiens locaux/}).click();await expect(page.locator('.record-row')).toHaveCount(1);await page.locator('.record-row').click();await expect(page.locator('.review-section')).toHaveCount(8);
 });
 test('retailer eighteen-SKU stock grid and capped substitution route',async({page})=>{
  await page.goto(base);await page.locator('.mode-card').filter({hasText:'Détaillant'}).click();await page.getByRole('button',{name:'Commencer l’entretien',exact:true}).click();
- await page.locator('#question-R1 input').nth(0).fill('Alger');await page.locator('#question-R1 input').nth(1).fill('Alger');await page.locator('#question-R1 input').nth(2).fill('POS-001');await page.locator('#question-R2 .answer-option').first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
+ await expect(page.locator('#question-R1')).toHaveCount(0);await page.locator('#question-R2 .answer-option').first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
  await expect(page.locator('#question-R3 select')).toHaveCount(18);for(let i=0;i<18;i++)await page.locator('#question-R3 select').nth(i).selectOption(i<10?'out':'full');await page.getByRole('button',{name:'Continuer',exact:true}).click();
  for(const id of ['R4','R5','R6'])await page.locator(`#question-${id} .answer-option`).first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
  await page.locator('#question-R7 .answer-option').last().click();await expect(page.locator('.substitution-row')).toHaveCount(8);await expect(page.locator('.substitution-row').first().locator('select').first().locator('option')).toHaveCount(21);for(let i=0;i<8;i++)await page.locator('.substitution-row').nth(i).locator('select').first().selectOption('none');await page.getByRole('button',{name:'Continuer',exact:true}).click();
@@ -53,6 +54,7 @@ test('supplied logo and eighteen photos load in all three languages',async({page
  await expect.poll(()=>page.evaluate(()=>[...document.fonts].some(font=>font.family==='Manrope'&&font.status==='loaded'))).toBe(true);
  expect(await page.locator('.brand-logo img').evaluate((img:HTMLImageElement)=>img.complete&&img.naturalWidth>0)).toBe(true);
  await page.locator('.eligibility input').check();await page.getByRole('button',{name:'Commencer l’entretien',exact:true}).click();
+ await expect(page.locator('#question-Q1 .question-meta bdi')).toHaveCSS('background-color','rgb(0, 171, 96)');await expect(page.locator('#question-Q1 .product-brand').first()).toHaveCSS('font-size','16px');await expect(page.locator('.question-meta')).toHaveText(['Q1','Q2']);
  const images=page.locator('#question-Q1 .product-visual img');await expect(images).toHaveCount(18);
  for(const img of await images.all()){
   await img.scrollIntoViewIfNeeded();await expect.poll(()=>img.evaluate((el:HTMLImageElement)=>el.complete&&el.naturalWidth>0)).toBe(true);
@@ -70,7 +72,7 @@ test('changing a purchase to no purchase skips and excludes stale answers',async
  await page.locator('.survey-stepper button').filter({hasText:'Votre décision'}).click();await page.locator('#question-Q5 .answer-option').filter({hasText:'J’achèterai plus tard'}).click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
  await expect(page.locator('#question-Q9')).toBeVisible();await expect(page.locator('#question-Q8')).toHaveCount(0);
  await page.getByRole('button',{name:'Continuer',exact:true}).click();await expect(page.locator('#question-Q10')).toBeVisible();await expect(page.locator('#question-Q11')).toHaveCount(0);
- await page.getByRole('button',{name:'Continuer',exact:true}).click();await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await page.getByRole('button',{name:'Enregistrer l’entretien',exact:true}).click();
+ await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await page.getByRole('button',{name:'Enregistrer l’entretien',exact:true}).click();
  const answers=await page.evaluate(()=>JSON.parse(localStorage.getItem('jti-pulse-records-v1')!)[0].answers);
  for(const id of ['Q6b','Q7','Q7a','Q7b','Q8','Q11','Q12'])expect(answers[id]).toBeUndefined();
  expect(answers.Q5).toBe('later');
@@ -78,7 +80,7 @@ test('changing a purchase to no purchase skips and excludes stale answers',async
 
 test('retailer recommendation branch and no flagged products',async({page})=>{
  await page.goto(base);await page.locator('.mode-card').filter({hasText:'Détaillant'}).click();await page.getByRole('button',{name:'Commencer l’entretien',exact:true}).click();
- for(const [i,value] of ['Alger','Alger','POS-002'].entries())await page.locator('#question-R1 input').nth(i).fill(value);
+
  await page.locator('#question-R2 .answer-option').first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
  for(const select of await page.locator('#question-R3 select').all())await select.selectOption('full');await page.getByRole('button',{name:'Continuer',exact:true}).click();
  for(const id of ['R4','R5','R6'])await page.locator(`#question-${id} .answer-option`).first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
@@ -89,4 +91,16 @@ test('retailer recommendation branch and no flagged products',async({page})=>{
  for(const id of ['R16','R17'])await page.locator(`#question-${id} .answer-option`).first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();await page.locator('#question-R18 .answer-option').first().click();
  await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await page.getByRole('button',{name:'Enregistrer l’entretien',exact:true}).click();
  const answers=await page.evaluate(()=>JSON.parse(localStorage.getItem('jti-pulse-records-v1')!)[0].answers);expect(answers.R8).toBeUndefined();expect(answers.R10).toBe('other');expect(answers['R10-other']).toBe('Critère local');
+});
+
+
+test('draft export keeps the language of each answer across switches and reloads',async({page})=>{
+ await page.goto(base);await page.locator('.eligibility input').check();await page.getByRole('button',{name:'Commencer l’entretien',exact:true}).click();
+ await page.locator('#question-Q1').getByText('MBO Red',{exact:true}).click();
+ await page.getByRole('tab',{name:'EN',exact:true}).click();await page.locator('#question-Q2 .answer-option').last().click();
+ await page.getByRole('tab',{name:'العربية'}).click();
+ const downloadPromise=page.waitForEvent('download');await page.locator('.draft-export').click();const download=await downloadPromise;
+ const {readFile}=await import('node:fs/promises');const exported=JSON.parse(await readFile((await download.path())!,'utf8'));
+ expect(exported.answers.Q1).toMatchObject({answer:'MBO Red',language:'fr'});expect(exported.answers.Q2.language).toBe('en');expect(exported.answers.Q2.answer).toBe('Both pack and stick');
+ await page.reload();const languages=await page.evaluate(()=>JSON.parse(localStorage.getItem('jti-pulse-draft-languages-v1')!));expect(languages.consumer).toEqual({Q1:'fr',Q2:'en'});
 });

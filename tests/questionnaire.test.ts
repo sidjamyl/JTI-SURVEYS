@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { activeSections, cleanAnswers, consumerSections, flaggedSkus, questionValid, retailerSections, skus, type Answers } from '../lib/questionnaire';
-import { interviewsCsv } from '../lib/storage';
+import { interviewsCsv, literalAnswers, interviewsJson, isQuestionLanguages } from '../lib/storage';
 const question=(id:string)=>[...consumerSections,...retailerSections].flatMap(s=>s.questions).find(q=>q.id===id)!;
 test('consumer routing follows purchase, format and substitution answers',()=>{
  const a:Answers={Q1:skus[0].id,Q2:'both',Q5:'other-stick',Q6b:skus[1].id,Q7:'stick'};
@@ -47,8 +47,8 @@ test('question codes, choice counts and SKU ranks match the original workbook',a
  const fixture=JSON.parse(await readFile(new URL('./fixtures/questionnaire.json',import.meta.url),'utf8'));
  for(const [mode,sections] of [['consumer',consumerSections],['retailer',retailerSections]] as const){
   const questions=sections.flatMap(s=>s.questions);
-  assert.deepEqual(questions.map(q=>q.id).sort(),fixture[mode].map((q:{id:string})=>q.id).sort());
-  for(const q of fixture[mode])if(q.choiceCount)assert.equal(questions.find(x=>x.id===q.id)?.options?.length,q.choiceCount,q.id);
+  assert.deepEqual(questions.map(q=>q.id).sort(),fixture[mode].filter((q:{id:string})=>!['Q13','Q14','R1'].includes(q.id)).map((q:{id:string})=>q.id).sort());
+  for(const q of fixture[mode])if(q.choiceCount&&!['Q13','Q14','R1'].includes(q.id))assert.equal(questions.find(x=>x.id===q.id)?.options?.length,q.choiceCount,q.id);
  }
  const normalized=(name:string)=>name.replace('Filsters','Filters').trim();
  assert.deepEqual(skus.map(s=>s.name),fixture.skus.map(normalized));
@@ -60,4 +60,25 @@ test('substitution export removes stale Other text while preserving an active se
  assert.deepEqual(cleanAnswers('retailer',a).R8,{[sku]:'none'});
  (a.R8 as Record<string,string>)[sku+'-second']='other';
  assert.deepEqual(cleanAnswers('retailer',a).R8,{[sku]:'none',[sku+'-second']:'other',[sku+'-other']:'Stale text'});
+});
+
+
+test('JSON exports literal answers with each question language and excludes removed fields',()=>{
+ const answers:Answers={Q1:'mbo-red',Q2:'both',Q2b:'other','Q2b-other':'Occasion',Q5:'later',Q13:'male',Q14:'1'};
+ const result=literalAnswers('consumer',answers,{Q1:'fr',Q2:'en',Q2b:'ar'},'fr');
+ assert.equal(result.Q1.answer,'MBO Red');assert.equal(result.Q1.language,'fr');
+ assert.equal(result.Q2.answer,question('Q2').options!.find(o=>o.id==='both')!.label.en);assert.equal(result.Q2.language,'en');
+ assert.equal(result.Q2b.answer,question('Q2b').options!.find(o=>o.id==='other')!.label.ar+' — Occasion');
+ assert.equal(result.Q5.language,null);assert.ok(!('Q13' in result));assert.ok(!('Q14' in result));
+ const parsed=JSON.parse(interviewsJson([{id:'test',mode:'consumer',language:'en',completedAt:'2026-10-09T10:00:00Z',schemaVersion:1,answers,questionLanguages:{Q2:'en'}}]));
+ assert.equal(parsed[0].answers.Q2.language,'en');assert.equal(parsed[0].questionLanguages,undefined);
+ assert.ok(isQuestionLanguages({Q2:'en'}));assert.ok(!isQuestionLanguages({Q2:'bad'}));
+});
+test('literal grid and multiple-choice answers preserve labels and free text',()=>{
+ const sku=skus[0].id;
+ const a:Answers={R3:{[sku]:'out',[skus[1].id]:'full'},R8:{[sku]:'other',[sku+'-other']:'Local brand',[sku+'-second']:'none',[skus[1].id]:'none'},R17:['Winston','Camel']};
+ const result=literalAnswers('retailer',a,{R3:'en',R8:'fr',R17:'ar'});
+ assert.equal((result.R3.answer as Record<string,string>)['MBO Red'],'Out of stock');
+ assert.deepEqual(Object.keys(result.R8.answer as object),['MBO Red']);
+ assert.ok(JSON.stringify(result.R8.answer).includes('Local brand'));assert.deepEqual(result.R17.answer,['Winston','Camel']);
 });

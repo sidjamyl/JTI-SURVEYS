@@ -9,3 +9,5 @@
 - Microcopy arabe : skill `itady74/ux-writing-arabic`, verbes directs et messages courts. Conserver le sens des questions et les erreurs utiles.
 - Mouvement : apparition discrète des choix avec Tailark, changement de langue avec Smooth UI ; respect du mouvement réduit.
 - Logo JTI et 18 photos utilisateur servis localement ; les paquets sont affichés sans recadrage. Aucun pack reconstitué.
+
+- Codes de question : badges verts `#00AB60` comme le logo fourni, texte blanc 16 px. Mentions de type de réponse supprimées ; noms des marques agrandis à 16 px (15 px dans la grille).
