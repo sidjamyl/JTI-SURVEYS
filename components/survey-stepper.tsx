@@ -9,8 +9,7 @@ export function SurveyStepper({sections,answers,lang,activeId,finished,onSelect}
  const answered=sections.reduce((n,s)=>n+s.questions.filter(q=>questionValid(q,answers)).length,0);
  // Saving is the final step, so complete answers alone never show 100%.
  const progress=finished?100:Math.round(answered/(total+1)*100);
- return <div className="survey-stepper">
-  <div className="stepper-status"><span>{finished?copy.completed[lang]:steps[activeIndex]?.title}</span><span><bdi>{finished?steps.length:activeIndex+1} / {steps.length}</bdi><span className="stepper-percentage"><bdi>{progress}%</bdi></span></span></div>
+ return <div className="survey-stepper" dir={lang==='ar'?'rtl':'ltr'}>
   <nav aria-label={copy.journey[lang]}><ol>{steps.map((step,i)=>{
    const available=!finished&&steps.slice(0,i).every(s=>s.complete);
    return <li key={step.id} className={`${step.complete?'complete':''} ${!finished&&i===activeIndex?'current':''}`}><button disabled={!available} aria-current={!finished&&i===activeIndex?'step':undefined} aria-label={`${i+1}. ${step.title}${step.complete?` · ${copy.completed[lang]}`:''}`} onClick={()=>onSelect(step.id)}><span className="step-dot">{step.complete?<Check size={14}/>:<bdi>{i+1}</bdi>}</span><span className="step-label">{step.title}</span></button></li>;
