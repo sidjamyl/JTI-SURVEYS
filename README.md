@@ -35,12 +35,16 @@ Source : `Algeria_OOS_Questionnaire_Workbook V1.xlsx`, fourni dans la conversati
 - Q9 et Q10 : posées à tous, le classeur ne mentionnant aucun saut. Ce choix littéral peut être à confirmer pour les non-acheteurs.
 - R3 : 18 statuts obligatoires. R8 : uniquement rupture ou unité, huit premières références selon le classement de ventes. « Aucun substitut / repart sans achat » est conservé ; deuxième choix facultatif et distinct du premier.
 - R10 : uniquement si R9 indique une recommandation.
-- Les réponses masquées après modification sont conservées dans le brouillon, puis exclues de l’entretien final.
+- Les réponses masquées après modification sont conservées pendant la session, puis exclues de l’entretien final.
 - À la demande utilisateur, Q13/Q14 (sexe et âge) et R1 (wilaya, ville, identifiant POS) sont retirés. R2 (type de point de vente) est conservé.
 
-## Sauvegarde et exports
+## Session et transmission à WinDev
 
-Les brouillons et entretiens sont stockés dans le navigateur sur cet appareil. Aucun serveur de collecte, accès équipe ou transfert à JTI n’est configuré. Un libellé discret indique la sauvegarde sur cet appareil. Les exports JSON donnent pour chaque question son texte, la réponse en clair et la langue au dernier changement de cette réponse (`{question, answer, language}`). Changer la langue de l’interface ne modifie pas cette information. Les anciens brouillons et entretiens ont `language: null` par question, car leur historique de langue est inconnu ; leur langue globale sert à traduire les libellés. Les champs supprimés et les réponses conditionnelles masquées sont exclus du JSON. Les grilles utilisent les noms des produits et les choix multiples des tableaux de libellés ; le CSV est normalisé en une ligne par question / élément de grille et protège les cellules contre l’exécution de formules. Vider les données du navigateur supprime ces entretiens : exporter avant.
+Les réponses restent en mémoire pendant la saisie et repartent de zéro à chaque réouverture, rechargement ou retour par l’historique du navigateur. Aucun brouillon ni entretien n’est sauvegardé par le formulaire. Les anciens enregistrements locaux ne sont ni utilisés ni supprimés.
+
+L’en-tête contient uniquement le logo JTI et un stepper compact. Le choix de langue reste dans le formulaire. Aucun bouton Retour à la première section, export de brouillon, entretien local ou écran final.
+
+Après vérification, le bouton « Valider les réponses » transmet un entretien complet via `WL.Execute("Reponse", json)`, puis reste désactivé sur le récapitulatif. Chaque réponse contient `{question, answer, language}`. WinDev gère la sauvegarde et la suite du parcours. En cas d’erreur du pont, le bouton permet de renvoyer le même JSON sans perdre la saisie tant que la page reste ouverte.
 
 ## Photos produit
 
@@ -85,7 +89,7 @@ Sources composants : [shadcn/ui](https://ui.shadcn.com/), [Smooth UI](https://sm
 
 Le projet Next.js est à la racine du dépôt GitHub `sidjamyl/JTI-SURVEYS` (le checkout local est dans `survey/`). Importer ce dépôt dans Vercel, framework Next.js, commande `npm run build`, sortie `out`. Ces réglages sont versionnés dans `vercel.json`. Aucun secret ni variable d’environnement n’est nécessaire au formulaire statique.
 
-Le changement de domaine ne transfère pas les entretiens : le stockage du navigateur est propre à chaque origine. Exporter les entretiens de l’ancien site avant de changer d’adresse.
+Les entretiens sont transmis à WinDev, qui est responsable de leur sauvegarde.
 
 ## Vérification du questionnaire
 

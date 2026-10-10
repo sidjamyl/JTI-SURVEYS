@@ -4,14 +4,14 @@
 
 Le projet **JTI Surveys**, environnement **production**, est créé et déployé dans Dokploy avec deux applications.
 
-| Service | URL HTTPS temporaire | Branche |
+| Service | URL HTTPS | Branche |
 | --- | --- | --- |
-| consumer | https://jti-surveys-consumer-romd1a-8efbe1-169-58-156-78.sslip.io | `consumer` |
-| retailer | https://jti-surveys-retailer-klatnh-49454f-169-58-156-78.sslip.io | `retailer` |
+| consumer | https://jti-consumer.esi-maint.com | `consumer` |
+| retailer | https://jti-details.esi-maint.com | `retailer` |
 
 Les services utilisent le fournisseur Git public et le Dockerfile du dépôt. Pour publier une mise à jour, pousser sur la branche correspondante puis cliquer **Deploy** dans son application Dokploy ; aucun webhook automatique n’est configuré. Aucun compte, jeton ou clé API n’a été créé pour cette installation : les fonctions locales de Dokploy ont été appelées depuis son conteneur sur le VPS.
 
-Ces adresses générées par Dokploy peuvent être remplacées dans **Domains** par vos domaines métier. Le stockage navigateur est propre à chaque origine : exporter les entretiens avant un changement de domaine.
+Les domaines métier sont configurés dans **Domains**. Les réponses restent uniquement en mémoire pendant le formulaire et sont transmises à WinDev à la validation.
 
 ## Projet et services
 
@@ -28,7 +28,7 @@ Créer le projet **JTI Surveys**, environnement **production**, puis deux applic
 | Docker context | . | . |
 | Port du domaine | 8080 | 8080 |
 
-Dans chaque application, ajouter votre domaine dans **Domains**, chemin `/`, port **8080**, activer HTTPS/Let's Encrypt après avoir pointé le DNS sur ce VPS, puis **Deploy**. Choisir deux hôtes différents pour séparer les données locales des deux parcours. Ne pas définir `NEXT_PUBLIC_BASE_PATH` : les services sont servis à la racine. Aucun token Dokploy ne doit être placé dans le dépôt ou dans le navigateur.
+Dans chaque application, ajouter votre domaine dans **Domains**, chemin `/`, port **8080**, activer HTTPS/Let's Encrypt après avoir pointé le DNS sur ce VPS, puis **Deploy**. Choisir deux hôtes différents pour les deux parcours. Ne pas définir `NEXT_PUBLIC_BASE_PATH` : les services sont servis à la racine. Aucun token Dokploy ne doit être placé dans le dépôt ou dans le navigateur.
 
 Les branches fixent le parcours dans `lib/deployment.ts` : aucune variable de sélection n'est requise. Les deux branches contiennent le Dockerfile complet.
 
@@ -48,4 +48,4 @@ Les dossiers de développement, les secrets `.env*` et les fichiers Git sont exc
 
 ## Mises à jour
 
-Déployer chaque branche dans son application. Pour ajouter une modification commune, la reporter dans les deux branches en conservant leur valeur `fixedMode`. Les données du navigateur sont propres au domaine : changer d'hôte ne les transfère pas. WinDev doit récupérer et sauvegarder le JSON via le pont décrit dans `WINDEV.md`.
+Déployer chaque branche dans son application. Pour ajouter une modification commune, la reporter dans les deux branches en conservant leur valeur `fixedMode`. Aucun entretien ni brouillon n’est enregistré dans le navigateur. WinDev doit récupérer et sauvegarder le JSON via le pont décrit dans `WINDEV.md`.
