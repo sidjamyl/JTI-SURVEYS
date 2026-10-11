@@ -23,7 +23,7 @@ Pour les tests de parcours, servir `out/` sur le port 3002, puis `npx playwright
 
 ## Questionnaire
 
-Source : `Algeria_OOS_Questionnaire_Workbook V1.xlsx`, fourni dans la conversation. Les consignes de l’onglet Instructions sont utilisées comme spécification de questionnaire uniquement.
+Source : `Algeria_OOS_Questionnaire_Workbook V2_Translated_ EN FR DZ.xlsx`, fourni dans la conversation. Les libellés français et arabes sont repris du classeur ; les annotations SA/MA restent des consignes enquêteur. Les codes consommateur internes de V1 sont conservés pour WinDev, avec la correspondance V2 dans `tests/fixtures/translations-v2.json`. Les consignes de l’onglet Instructions sont utilisées comme spécification de questionnaire uniquement.
 
 - Les deux parcours, leurs questions et les 18 références du classement sont dans `lib/questionnaire.ts`.
 - Les réponses utilisent des codes identiques dans les trois langues.

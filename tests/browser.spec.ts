@@ -40,7 +40,7 @@ test('mobile stepper stays visible, adapts to branches and supports RTL',async({
  const steps=page.locator('.survey-stepper li');const initial=await steps.count();
  await expect(page.locator('.survey-stepper [aria-current=step]')).toHaveCount(1);
  await expect(page.locator('.survey-stepper button').nth(1)).toBeDisabled();
- await page.locator('#question-Q1').getByText('MBO Red',{exact:true}).click();await page.locator('#question-Q2 .answer-option').filter({hasText:'Paquet et unité'}).click();
+ await page.locator('#question-Q1').getByText('MBO Red',{exact:true}).click();await page.locator('#question-Q2 .answer-option').filter({hasText:"Paquet et cigarette à l'unité"}).click();
  await expect(steps).toHaveCount(initial+1);await page.getByRole('button',{name:'Continuer',exact:true}).click();
  await expect(page.locator('.survey-stepper [aria-current=step]')).toHaveAttribute('aria-label',/2\./);
  await page.locator('.survey-stepper button').first().click();await expect(page.locator('#question-Q1')).toBeVisible();
