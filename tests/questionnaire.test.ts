@@ -82,3 +82,21 @@ test('literal grid and multiple-choice answers preserve labels and free text',()
  assert.deepEqual(Object.keys(result.R8.answer as object),['MBO Red']);
  assert.ok(JSON.stringify(result.R8.answer).includes('Local brand'));assert.deepEqual(result.R17.answer,['Winston','Camel']);
 });
+
+test('French and Algerian Arabic questions and answers match the translated V2 workbook',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const fixture=JSON.parse(await readFile(new URL('./fixtures/translations-v2.json',import.meta.url),'utf8'));
+ const questions=[...consumerSections,...retailerSections].flatMap(s=>s.questions);
+ assert.deepEqual(Object.keys(fixture).sort(),questions.map(q=>q.id).sort());
+ const {stockOptions}=await import('../lib/questionnaire');
+ for(const q of questions){
+  for(const lang of ['fr','ar'] as const)assert.equal(q.text[lang],fixture[q.id].text[lang],`${q.id} ${lang}`);
+  const options=q.type==='stock'?stockOptions:q.options;
+  if(options){
+   assert.deepEqual(options.map(o=>o.id).sort(),Object.keys(fixture[q.id].options).sort(),q.id);
+   for(const o of options)for(const lang of ['fr','ar'] as const)assert.equal(o.label[lang],fixture[q.id].options[o.id][lang],`${q.id} ${o.id} ${lang}`);
+  }
+ }
+ const result=literalAnswers('consumer',{Q1:'mbo-red',Q5:'other-pack',Q6b:'camel-yellow',Q11:'4'},{Q11:'ar'});
+ assert.equal(result.Q11.answer,fixture.Q11.options['4'].ar);
+});
