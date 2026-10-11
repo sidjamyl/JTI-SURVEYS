@@ -16,7 +16,7 @@ export async function fillToReview(page:Page,mode:Mode,overrides:Answers={}) {
    if(q.type==='sku')await field.getByText(skus.find(s=>s.id===value)!.name,{exact:true}).click();
    else if(q.type==='single'||q.type==='multi')for(const v of Array.isArray(value)?value:[value])await field.locator(`input[value="${v}"]`).check({force:true});
    else if(q.type==='number')await field.locator('input[type=number]').fill(String(value));
-   else if(q.type==='scale')await field.locator('.scale-options label').nth(Number(value)-1).click();
+   else if(q.type==='scale')await field.locator('.answer-option').nth(Number(value)-1).click();
    else if(q.type==='stock')for(const [sku,status] of Object.entries(value as Record<string,string>))await field.locator(`#stock-${sku}`).selectOption(status);
    else for(const select of await field.locator('.substitution-row select').all())await select.selectOption('none');
   }

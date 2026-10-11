@@ -1,0 +1,735 @@
+{
+  "Q1": {
+    "workbookId": "Q2",
+    "text": {
+      "fr": "Pourriez-vous me préciser s'il vous plait, quelle référence produit souhaitiez-vous acheter en arrivant dans ce point de vente ? (référence principale)",
+      "ar": "أي نوع (ماركة / صنف) كنت ناوي تشري كي جيت لهذا  الحانوت؟ ( النوع الأساسي تاعك؟)"
+    }
+  },
+  "Q2": {
+    "workbookId": "Q3",
+    "text": {
+      "fr": "Et quel format achetez-vous habituellement pour votre référence/SKU principale  ?",
+      "ar": "وواشنو هو الفورما اللي تشريه عادةً للنوع الأساسي تاعك ؟ (ماركة / صنف)"
+    },
+    "options": {
+      "pack": {
+        "fr": "Paquet entier",
+        "ar": "بالباكي"
+      },
+      "stick": {
+        "fr": "Cigarette à l'unité",
+        "ar": "بالڤوارا"
+      },
+      "both": {
+        "fr": "Paquet et cigarette à l'unité",
+        "ar": "باكي و ڤوارا"
+      }
+    }
+  },
+  "Q2b": {
+    "workbookId": "Q3b",
+    "text": {
+      "fr": "Pourquoi vous achetez parfois des paquets et parfois des cigarettes à l'unité ?",
+      "ar": "علاش تشري مرات بالباكي ومرات بالڤوارا؟"
+    },
+    "options": {
+      "money": {
+        "fr": "Cela dépend du budget / de l'occasion",
+        "ar": "على حساب الدراهم / المناسبة"
+      },
+      "availability": {
+        "fr": "Cela dépend de la disponibilité",
+        "ar": "على حساب واش كاين متوفر"
+      },
+      "other": {
+        "fr": "Autre",
+        "ar": "حاجة أخرى"
+      }
+    }
+  },
+  "Q3": {
+    "workbookId": "Q4",
+    "text": {
+      "fr": "Avez-vous trouvé le produit que vous recherchiez dans ce point de vente ?",
+      "ar": "هل لقيت المنتوج اللي كنت حاب تشريه  في هذا الحانوت؟"
+    },
+    "options": {
+      "full": {
+        "fr": "Oui, ma référence principale/SKU était disponible dans le format souhaité (paquet ou unité)",
+        "ar": "إيه، المنتوج الرئيسي تاعي كان متوفر بالفورما اللي حبيت (بالڤوارا ولا بالباكي)."
+      },
+      "limited": {
+        "fr": "Oui, ma référence principale/SKU était disponible , mais pas dans le format souhaité",
+        "ar": "إيه، المنتوج الرئيسي تاعي كان متوفر، بصح ماشي بالفورما اللي حبيت."
+      },
+      "out": {
+        "fr": "Non, ma référence principale/SKU n'était disponible ni en paquet ni à l'unité",
+        "ar": "لا لا ، المنتوج الرئيسي تاعي ما كانش متوفر لا بالباكي لا بالڤوارا."
+      }
+    }
+  },
+  "Q4": {
+    "workbookId": "Q5",
+    "text": {
+      "fr": "Et que s’est-il passé lorsque vous avez demandé le produit que vous recherchiez ?",
+      "ar": "وواش صرا كي طلبت المنتوج اللي كنت حاب تشريه؟"
+    },
+    "options": {
+      "had": {
+        "fr": "Le vendeur l'avait",
+        "ar": "مول الحانوت كان عندو المنتوج."
+      },
+      "out": {
+        "fr": "Le vendeur m'a dit qu'il était en rupture de stock",
+        "ar": "مول الحانوت قالي بلي المنتوج راهوRupture de stock"
+      },
+      "brand": {
+        "fr": "Le vendeur m'a proposé une autre marque",
+        "ar": "مول الحانوت اقترح ليّ ماركة أخرى."
+      },
+      "sku": {
+        "fr": "Le vendeur m'a proposé une autre référence/SKU de la même marque",
+        "ar": "مول الحانوت اقترح ليّ منتوج آخر من نفس الماركة."
+      },
+      "sticks": {
+        "fr": "Le vendeur n'avait que des cigarettes à l'unité, pas de paquets",
+        "ar": "مول الحانوت كان عندو غير بالڤوارا، ما كانش عندو الباكي."
+      },
+      "packs": {
+        "fr": "Le vendeur n'avait que des paquets, pas de cigarettes à l'unité",
+        "ar": "مول الحانوت كان عندو غير الباكي، ما كانش عندو الڤوارا."
+      },
+      "saw": {
+        "fr": "J'ai vu qu'il n'était pas disponible avant de le demander",
+        "ar": "شفت بلي المنتوج ما كانش متوفر قبل ما نطلبو."
+      },
+      "other": {
+        "fr": "Autre",
+        "ar": "حاجة أخرى."
+      }
+    }
+  },
+  "Q5": {
+    "workbookId": "Q6",
+    "text": {
+      "fr": "Qu’avez-vous finalement décidé de faire ?",
+      "ar": "واش درت في الأخير؟"
+    },
+    "options": {
+      "intended": {
+        "fr": "J’ai acheté la référence que je souhaitais initialement.",
+        "ar": "شريت المنتوج اللي كنت حاب تشريه من الأول."
+      },
+      "same-brand": {
+        "fr": "J'ai acheté une autre référence de la même marque",
+        "ar": "شريت منتوج آخر من نفس الماركة."
+      },
+      "other-pack": {
+        "fr": "J'ai acheté une autre marque en paquet",
+        "ar": "شريت ماركة أخرى بالباكي."
+      },
+      "other-stick": {
+        "fr": "J'ai acheté une autre marque à l'unité",
+        "ar": "شريت ماركة أخرى بالڤوارا."
+      },
+      "category": {
+        "fr": "J'ai acheté un produit d'une autre catégorie",
+        "ar": "شريت منتوج من فئة أخرى."
+      },
+      "search": {
+        "fr": "J'ai décidé de chercher dans un autre point de vente",
+        "ar": "قررت نقلب عليه في نقطة بيع أخرى."
+      },
+      "later": {
+        "fr": "J'ai décidé d'achèter plus tard",
+        "ar": "قررت نشريه من بعد."
+      },
+      "other": {
+        "fr": "Autre",
+        "ar": "حاجة أخرى."
+      }
+    }
+  },
+  "Q6b": {
+    "workbookId": "Q6b",
+    "text": {
+      "fr": "Et quelle référence/SKU avez-vous finalement achetée ?",
+      "ar": "أي نوع شريت؟"
+    }
+  },
+  "Q7": {
+    "workbookId": "Q7",
+    "text": {
+      "fr": "Et en quel format l'avez-vous acheté ?",
+      "ar": "وواشنو هو الفورما اللي شريت؟"
+    },
+    "options": {
+      "pack": {
+        "fr": "Paquet entier",
+        "ar": "باكي"
+      },
+      "stick": {
+        "fr": "Cigarette à l'unité",
+        "ar": "ڤوارا"
+      },
+      "both": {
+        "fr": "Paquet et cigarette à l'unité",
+        "ar": "باكي و ڤوارا"
+      }
+    }
+  },
+  "Q7a": {
+    "workbookId": "Q7a",
+    "text": {
+      "fr": "Combien de cigarettes à l'unité avez-vous achetées ?",
+      "ar": "شحال من ڤوارا شريت؟"
+    }
+  },
+  "Q7b": {
+    "workbookId": "Q7b",
+    "text": {
+      "fr": "Combien de paquets avez-vous achetés ?",
+      "ar": "شحال من باكي شريت؟"
+    }
+  },
+  "Q9": {
+    "workbookId": "Q11",
+    "text": {
+      "fr": "Comment décririez-vous votre choix de cette autre référence ?",
+      "ar": "كيفاش توصف اختيارك لهاد المنتوج الآخر؟"
+    },
+    "options": {
+      "deliberate": {
+        "fr": "J'ai choisi cette alternative de façon délibérée",
+        "ar": "كنت داير في بالي نشريه"
+      },
+      "few": {
+        "fr": "Je l’ai choisie parce que les options disponibles étaient limitées",
+        "ar": "شريتو خاطر الخيارات المتوفرة كانت محدودة."
+      },
+      "suggested": {
+        "fr": "J'ai accepté ce que le vendeur m'a suggéré",
+        "ar": "قبلت بالمنتوج اللي اقترحولي مول الحانوت"
+      },
+      "unavailable": {
+        "fr": "Je ne l'ai achetée que parce que mon produit habituel n'était pas disponible",
+        "ar": "شريتو خاطر المنتوج اللي نشريه عادةً ما كانش متوفر."
+      },
+      "unsure": {
+        "fr": "Je ne sais pas",
+        "ar": "ما علاباليش"
+      }
+    }
+  },
+  "Q8": {
+    "workbookId": "Q9",
+    "text": {
+      "fr": "Pourquoi avez-vous choisi cette référence/SKU, au lieu de votre référence principale?",
+      "ar": "علاش خيرت هاد المنتوج بدل من المنتوج اللي تشريه عادةً؟ (اختار حتى 3 إجابات)"
+    },
+    "options": {
+      "only": {
+        "fr": "C'était la seule option disponible",
+        "ar": "خاطر كان هو الخيار الوحيد المتوفر."
+      },
+      "closest": {
+        "fr": "L'alternative la plus proche de mon produit habituel",
+        "ar": "خاطر كان أقرب منتوج للمنتوج اللي نشريه عادةً."
+      },
+      "cheaper": {
+        "fr": "C’était moins cher.",
+        "ar": "خاطر كان أرخص."
+      },
+      "taste": {
+        "fr": "Le goût ou le niveau d’intensité était similaire.",
+        "ar": "خاطر الذوق  تاعو كان مشابه."
+      },
+      "trust": {
+        "fr": "Je connais / je fais confiance à la marque",
+        "ar": "نعرف الماركة هذي ونثق فيها."
+      },
+      "recommend": {
+        "fr": "Le vendeur me l'a recommandée",
+        "ar": "مول الحانوت هو اللي اقترح لي."
+      },
+      "stick": {
+        "fr": "Elle était disponible à l’unité.",
+        "ar": "خاطر كان متوفر بالڤوارا."
+      },
+      "pack": {
+        "fr": "Elle était disponible en paquet entier",
+        "ar": "خاطر كان متوفر بالباكي"
+      },
+      "search": {
+        "fr": "Je ne voulais pas chercher ailleurs",
+        "ar": "ما حبيتش نحوس عليه في بلاصة واحدوخرا"
+      },
+      "budget": {
+        "fr": "Je n’avais pas suffisamment d’argent pour acheter un paquet entier.",
+        "ar": "ما كانوش عندي دراهم باش نشري باكي"
+      }
+    }
+  },
+  "Q10": {
+    "workbookId": "Q12",
+    "text": {
+      "fr": "Si votre produit habituel redevenait disponible, que feriez-vous ?",
+      "ar": "إذا رجع المنتوج اللي تشريه عادةً متوفر، واش راح تدير؟"
+    },
+    "options": {
+      "return": {
+        "fr": "Je reviendrai à mon produit habituel",
+        "ar": "نعاود نولي نشري المنتوج اللي كنت نشريه عادةً."
+      },
+      "continue": {
+        "fr": "Je continuerai à acheter le produit acheté aujourd'hui",
+        "ar": "نكمل نشري المنتوج اللي شريتو اليوم."
+      },
+      "availability": {
+        "fr": "J'achèterai les deux selon la disponibilité",
+        "ar": "نشريهم بين زوج، على حساب واش يكون متوفر."
+      },
+      "price": {
+        "fr": "J'achèterai les deux selon le prix",
+        "ar": "نشريهم بين زوج، على حساب السعر."
+      },
+      "unsure": {
+        "fr": "Je ne sais pas",
+        "ar": "ما علاباليش"
+      }
+    }
+  },
+  "Q11": {
+    "workbookId": "Q13",
+    "text": {
+      "fr": "Pensez-vous acheter à nouveau le produit que vous avez acheté aujourd’hui ?",
+      "ar": "هل تتوقع تعاود تشري المنتوج اللي شريتو اليوم؟"
+    },
+    "options": {
+      "1": {
+        "fr": "1 - Je n’achèterai certainement pas",
+        "ar": "1 – أكيد ما نعاودش نشريه."
+      },
+      "2": {
+        "fr": "2 - Je n’achèterai probablement pas",
+        "ar": "2 – ما شكيتش نعاود نشريه."
+      },
+      "3": {
+        "fr": "3 - Je ne sais pas",
+        "ar": "3 – ما علاباليش"
+      },
+      "4": {
+        "fr": "4 - J’achèterai probablement",
+        "ar": "4 – بالاك نعاود نشريه."
+      },
+      "5": {
+        "fr": "5 - J’achèterai certainement",
+        "ar": "5 – أكيد نعاود نشريه."
+      }
+    }
+  },
+  "Q12": {
+    "workbookId": "Q14",
+    "text": {
+      "fr": "Qu'est-ce qui vous ferait revenir à votre marque principale ?",
+      "ar": "واش اللي يقدر يخليك ترجع للماركة تاعك الاصلية؟"
+    },
+    "options": {
+      "availability": {
+        "fr": "Une meilleure disponibilité",
+        "ar": "تكون متوفرة أكثر."
+      },
+      "price": {
+        "fr": "Un prix identique / stable",
+        "ar": "يكون السعر نفسه و يبقى مستقر."
+      },
+      "quality": {
+        "fr": "Une meilleure fraîcheur / qualité",
+        "ar": "تكون الجودة أحسن."
+      },
+      "stick": {
+        "fr": "Disponibilité à l'unité",
+        "ar": "تكون متوفرة بالڤوارا."
+      },
+      "recommend": {
+        "fr": "La recommandation du vendeur",
+        "ar": "مول الحانوت ينصحني بيها."
+      },
+      "return": {
+        "fr": "Rien de particulier, je reviendrai de toute façon",
+        "ar": "ما كاين حتى سبب خاص، نرجعلها على كل حال."
+      },
+      "stay": {
+        "fr": "Rien de particulier, je pourrais continuer avec la nouvelle marque",
+        "ar": "ما كاين حتى سبب خاص، ونقدر نواصل نشري الماركة الجديدة."
+      },
+      "other": {
+        "fr": "Autre",
+        "ar": "حاجة أخرى."
+      }
+    }
+  },
+  "R2": {
+    "workbookId": "R2",
+    "text": {
+      "fr": "Type de PDV",
+      "ar": "نوع نقطة البيع"
+    },
+    "options": {
+      "grocery": {
+        "fr": "Épicerie traditionnelle",
+        "ar": "حانوت / إيبسري تقليدي."
+      },
+      "tobacco": {
+        "fr": "Bureau Tabac",
+        "ar": "محل بيع التبغ.Bureau Tabac"
+      },
+      "kiosk": {
+        "fr": "Kiosque",
+        "ar": "كيوسك."
+      },
+      "other": {
+        "fr": "Autre",
+        "ar": "نوع آخر."
+      }
+    }
+  },
+  "R3": {
+    "workbookId": "R3",
+    "text": {
+      "fr": "Pour chaque référence produit, veuillez indiquer sa disponibilité actuelle dans ce point de vente.",
+      "ar": "بالنسبة لكل منتوج، قولنا إذا راهو متوفر حاليًا في نقطة البيع هذي."
+    },
+    "options": {
+      "full": {
+        "fr": "Disponible en paquet entier et à l’unité",
+        "ar": "متوفر بالباكي  وبالڤوارا."
+      },
+      "stick": {
+        "fr": "Disponible uniquement à l'unité",
+        "ar": "متوفر غير بالڤوارا."
+      },
+      "out": {
+        "fr": "En rupture de stock",
+        "ar": "راهو Rupture de stock / مااشي متوفر."
+      },
+      "not-sold": {
+        "fr": "Non vendu dans ce PDV",
+        "ar": "ما نبيعوش المنتوج هذا في نقطة البيع هذي."
+      },
+      "unknown": {
+        "fr": "Ne sait pas.",
+        "ar": "ما علاباليش"
+      }
+    }
+  },
+  "R4": {
+    "workbookId": "R4",
+    "text": {
+      "fr": "Par rapport à leur niveau habituel, les ventes de cigarettes à l’unité ont-elles augmenté récemment ?",
+      "ar": "مقارنة بالمعتاد، هل لاحظت بلي مبيعات بالڤوارا زادو في الفترة الأخيرة؟"
+    },
+    "options": {
+      "much": {
+        "fr": "Ont fortement augmenté",
+        "ar": "زادو بزاف."
+      },
+      "slight": {
+        "fr": "Ont légèrement augmenté",
+        "ar": "زادو شوية."
+      },
+      "same": {
+        "fr": "Sont restées stables",
+        "ar": "بقات كيف كيف."
+      },
+      "less": {
+        "fr": "Ont diminué",
+        "ar": "نقصت."
+      },
+      "unknown": {
+        "fr": "Ne sait pas",
+        "ar": "ما علاباليش."
+      }
+    }
+  },
+  "R5": {
+    "workbookId": "R5",
+    "text": {
+      "fr": "En cas de rupture de stock, les consommateurs achètent-ils plus souvent des cigarettes à l’unité ?",
+      "ar": "كي يكون المنتوج Rupture de Stock، هل الزبائن يشرو بالڤوارا أكثر من العادة؟"
+    },
+    "options": {
+      "much": {
+        "fr": "Oui, beaucoup plus souvent",
+        "ar": "إيه، أكثر بزاف."
+      },
+      "slight": {
+        "fr": "Oui, légèrement plus souvent",
+        "ar": "إيه، أكثر شوية."
+      },
+      "same": {
+        "fr": "Pas de changement",
+        "ar": "ما تبدّل والو."
+      },
+      "less": {
+        "fr": "Moins souvent",
+        "ar": "ولاو يشرو بالڤوارا أقل."
+      },
+      "unknown": {
+        "fr": "Ne sait pas",
+        "ar": "ما علاباليش"
+      }
+    }
+  },
+  "R6": {
+    "workbookId": "R6",
+    "text": {
+      "fr": "Laquelle des situations suivantes décrit le mieux le comportement actuel des consommateurs ?",
+      "ar": "بالنسبة ليك واش من حالة من هاذ الحالات  اللي تصف أكثر تصرّف الزبائن في الوقت الحالي؟"
+    },
+    "options": {
+      "unavailable": {
+        "fr": "Ils achètent des cigarettes à l’unité parce que leur paquet habituel n’est pas disponible",
+        "ar": "يشرو  بالڤوارا خاطر الباكي اللي يشروه عادةً ما راهوش متوفر."
+      },
+      "money": {
+        "fr": "Ils achètent des cigarettes à l’unité parce qu’ils n’ont pas assez d’argent pour acheter un paquet complet",
+        "ar": "يشرو بالڤوارا خاطر ما عندهمش دراهم  باش يشرو باكي كامل."
+      },
+      "try": {
+        "fr": "Ils achètent des cigarettes à l’unité pour essayer une autre marque",
+        "ar": "يشرو بالڤوارا باش يجرّبو ماركة أخرى."
+      },
+      "search": {
+        "fr": "Ils achètent des cigarettes à l’unité en attendant de trouver leur marque habituelle dans un autre point de vente",
+        "ar": "يشرو بالڤوارا حتى يلقاو الماركة اللي يشروها عادةً في نقطة بيع أخرى."
+      },
+      "same": {
+        "fr": "Il n’y a pas de changement notable dans les achats à l’unité",
+        "ar": "ما كاين حتى تغيير ملحوظ في الشراء بالڤوارا"
+      },
+      "other": {
+        "fr": "Autres",
+        "ar": "حاجة أخرى، وضّح."
+      }
+    }
+  },
+  "R7": {
+    "workbookId": "R7",
+    "text": {
+      "fr": "Lorsqu’un consommateur demande une marque qui n’est pas disponible, que se passe-t-il généralement ?",
+      "ar": "كي يطلب الزبون ماركة ما راهيش متوفرة، واش يصرا غالبًا؟"
+    },
+    "options": {
+      "brand": {
+        "fr": "Il achète une autre marque dans ce PDV",
+        "ar": "يشري ماركة أخرى من عندي."
+      },
+      "sku": {
+        "fr": "Il achète une autre référence de la même marque",
+        "ar": "يشري منتوج آخر من نفس الماركة."
+      },
+      "stick": {
+        "fr": "Il achète des cigarettes à l’unité plutôt qu’un paquet complet",
+        "ar": "يشري بالڤوارا ماشي بالباكي"
+      },
+      "leave": {
+        "fr": "Il part chercher ailleurs",
+        "ar": "يروح يحوس عليها في بلاصة أخرى."
+      },
+      "none": {
+        "fr": "Il n'achète pas",
+        "ar": "ما يشري والو."
+      }
+    }
+  },
+  "R8": {
+    "workbookId": "R8",
+    "text": {
+      "fr": "Pour les références que vous avez indiquées comme étant en rupture de stock ou disponibles uniquement à l’unité à la question R3, vers quel produit les consommateurs se tournent-ils le plus souvent lorsqu’ils ne trouvent pas la référence recherchée ?",
+      "ar": "بالنسبة للمنتوجات اللي قلت بلي راهي Rupture de Stock أو متوفرة غير بالڤوارا في السؤال R3، واش هو المنتوج اللي يروحولُو الزبائن غالبًا كي ما يلقاوش المنتوج اللي يحوسو عليه؟"
+    }
+  },
+  "R9": {
+    "workbookId": "R9",
+    "text": {
+      "fr": "Recommandez-vous généralement une alternative lorsqu’un consommateur demande une marque qui n’est pas disponible ?",
+      "ar": "هل تقترح عادةً بديل للزبون كي يطلب ماركة ما راهيش متوفرة؟"
+    },
+    "options": {
+      "always": {
+        "fr": "Oui, toujours",
+        "ar": "يه، دايما."
+      },
+      "sometimes": {
+        "fr": "Oui, parfois",
+        "ar": "إيه، مرات."
+      },
+      "decides": {
+        "fr": "Non, le consommateur décide",
+        "ar": "لا لا، نخلي الزبون يقرّر وحدو."
+      },
+      "no": {
+        "fr": "Non, je lui indique simplement que le produit n’est pas disponible",
+        "ar": "لا لا،  نقولو برك بلي المنتوج ما راهوش متوفر."
+      }
+    }
+  },
+  "R10": {
+    "workbookId": "R10",
+    "text": {
+      "fr": "En général, sur quelle base choisissez-vous la marque que vous recommander au client ?",
+      "ar": "عمومًا، على أي أساس تختار الماركة اللي تقترحها على الزبون؟"
+    },
+    "options": {
+      "family": {
+        "fr": "Une référence de la même famille de marque",
+        "ar": "نقترح عليه منتوج من نفس عائلة الماركة."
+      },
+      "price": {
+        "fr": "Une marque dans une gamme de prix similaire",
+        "ar": "ماركة في نفس مستوى السعر."
+      },
+      "taste": {
+        "fr": "Une marque au goût ou à l’intensité similaire",
+        "ar": "ماركة عندها ذوق  مشابه"
+      },
+      "availability": {
+        "fr": "Une marque plus régulièrement disponible",
+        "ar": "ماركة تكون متوفرة بانتظام أكثر."
+      },
+      "margin": {
+        "fr": "Une marque offrant une meilleure marge",
+        "ar": "ماركة تعطيني هامش ربح أكبر."
+      },
+      "requested": {
+        "fr": "Une marque souvent demandée par d’autres consommateurs",
+        "ar": "ماركة يطلبوها بزاف زبائن آخرين."
+      },
+      "any": {
+        "fr": "Le produit disponible, quel qu’il soit",
+        "ar": "أي منتوج يكون متوفر، ما يهمش واش هو."
+      },
+      "other": {
+        "fr": "Autre",
+        "ar": "حاجة أخرى."
+      }
+    }
+  },
+  "R16": {
+    "workbookId": "R16",
+    "text": {
+      "fr": "Lorsque les marques qui étaient en rupture de stock redeviennent disponibles, que font généralement les consommateurs ?",
+      "ar": "كي ترجع الماركات اللي كانتRupture de Stock  متوفرة، واش يديرو الزبائن غالبًا؟"
+    },
+    "options": {
+      "return": {
+        "fr": "La plupart reviennent à leur marque habituelle",
+        "ar": "الأغلبية يرجعو للماركة اللي يشروها عادةً."
+      },
+      "some": {
+        "fr": "Certains reviennent à leur marque habituelle, tandis que d’autres continuent à acheter la marque de remplacement",
+        "ar": "كاين اللي يرجع لماركتو المعتادة، وكاين اللي يواصل يشري الماركة البديلة."
+      },
+      "stay": {
+        "fr": "Beaucoup continuent à acheter la marque de remplacement",
+        "ar": "بزاف منهم يواصلو يشرو الماركة البديلة."
+      },
+      "price": {
+        "fr": "Cela dépend du prix",
+        "ar": "على حساب السعر."
+      },
+      "availability": {
+        "fr": "Cela dépend de la régularité de la disponibilité du produit",
+        "ar": "على حساب مدى توفّر المنتوج بانتظام."
+      },
+      "unknown": {
+        "fr": "Ne sait pas",
+        "ar": "ما علاباليش."
+      }
+    }
+  },
+  "R17": {
+    "workbookId": "R17",
+    "text": {
+      "fr": "Quelles sont les marques qui bénéficient le plus actuellement des ruptures de stock des autres marques ?",
+      "ar": "واشنو هي الماركات اللي راهي تستافد الأكثر حاليًا من Rupture de Stock  الماركات الأخرى؟ (اختار عدة إجابات)"
+    },
+    "options": {
+      "Camel": {
+        "fr": "Camel",
+        "ar": "Camel"
+      },
+      "Winston": {
+        "fr": "Winston",
+        "ar": "Winston"
+      },
+      "LD": {
+        "fr": "LD",
+        "ar": "LD"
+      },
+      "Marlboro": {
+        "fr": "Marlboro",
+        "ar": "Marlboro"
+      },
+      "L&M": {
+        "fr": "L&M",
+        "ar": "L&M"
+      },
+      "Gauloises": {
+        "fr": "Gauloises",
+        "ar": "Gauloises"
+      },
+      "Rothmans": {
+        "fr": "Rothmans",
+        "ar": "Rothmans"
+      },
+      "other": {
+        "fr": "Autre",
+        "ar": "أخرى"
+      }
+    }
+  },
+  "R18": {
+    "workbookId": "R18",
+    "text": {
+      "fr": "Quelles sont les marques qui souffrent le plus actuellement des ruptures de stock ?",
+      "ar": "واشنو هي الماركات اللي راهي مضرورة الأكثر حاليًاعلى جالRupture de Stock  ؟"
+    },
+    "options": {
+      "Camel": {
+        "fr": "Camel",
+        "ar": "Camel"
+      },
+      "Winston": {
+        "fr": "Winston",
+        "ar": "Winston"
+      },
+      "LD": {
+        "fr": "LD",
+        "ar": "LD"
+      },
+      "Marlboro": {
+        "fr": "Marlboro",
+        "ar": "Marlboro"
+      },
+      "L&M": {
+        "fr": "L&M",
+        "ar": "L&M"
+      },
+      "Gauloises": {
+        "fr": "Gauloises",
+        "ar": "Gauloises"
+      },
+      "Rothmans": {
+        "fr": "Rothmans",
+        "ar": "Rothmans"
+      },
+      "other": {
+        "fr": "Autre",
+        "ar": "أخرى"
+      }
+    }
+  }
+}
