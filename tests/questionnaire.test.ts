@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { activeSections, cleanAnswers, consumerSections, flaggedSkus, questionValid, retailerSections, skus, type Answers } from '../lib/questionnaire';
-import { interviewsCsv, literalAnswers, interviewsJson, isQuestionLanguages } from '../lib/storage';
+import { interviewsCsv, literalAnswers, interviewsJson, isQuestionLanguages, interviewPayload, isInterview } from '../lib/storage';
 const question=(id:string)=>[...consumerSections,...retailerSections].flatMap(s=>s.questions).find(q=>q.id===id)!;
 test('consumer routing follows purchase, format and substitution answers',()=>{
  const a:Answers={Q1:skus[0].id,Q2:'both',Q5:'other-stick',Q6b:skus[1].id,Q7:'stick'};
@@ -42,13 +42,13 @@ test('all question and option translations are present in three languages',()=>{
  for(const q of [...consumerSections,...retailerSections].flatMap(s=>s.questions))for(const lang of ['fr','en','ar'] as const){assert.ok(q.text[lang].trim());for(const o of q.options??[])assert.ok(o.label[lang].trim());}
 });
 
-test('question codes, choice counts and SKU ranks match the original workbook',async()=>{
+test('question codes, choice counts and SKU ranks preserve the workbook with requested location and POS updates',async()=>{
  const {readFile}=await import('node:fs/promises');
  const fixture=JSON.parse(await readFile(new URL('./fixtures/questionnaire.json',import.meta.url),'utf8'));
  for(const [mode,sections] of [['consumer',consumerSections],['retailer',retailerSections]] as const){
   const questions=sections.flatMap(s=>s.questions);
-  assert.deepEqual(questions.map(q=>q.id).sort(),fixture[mode].filter((q:{id:string})=>!['Q13','Q14','R1'].includes(q.id)).map((q:{id:string})=>q.id).sort());
-  for(const q of fixture[mode])if(q.choiceCount&&!['Q13','Q14','R1'].includes(q.id))assert.equal(questions.find(x=>x.id===q.id)?.options?.length,q.choiceCount,q.id);
+  assert.deepEqual(questions.filter(q=>q.id!=='Q0').map(q=>q.id).sort(),fixture[mode].filter((q:{id:string})=>!['Q13','Q14'].includes(q.id)).map((q:{id:string})=>q.id).sort());
+  for(const q of fixture[mode])if(q.choiceCount&&!['Q13','Q14'].includes(q.id))assert.equal(questions.find(x=>x.id===q.id)?.options?.length,q.id==='R2'?2:q.choiceCount,q.id);
  }
  const normalized=(name:string)=>name.replace('Filsters','Filters').trim();
  assert.deepEqual(skus.map(s=>s.name),fixture.skus.map(normalized));
@@ -83,7 +83,7 @@ test('literal grid and multiple-choice answers preserve labels and free text',()
  assert.ok(JSON.stringify(result.R8.answer).includes('Local brand'));assert.deepEqual(result.R17.answer,['Winston','Camel']);
 });
 
-test('French and Algerian Arabic questions and answers match the translated V2 workbook',async()=>{
+test('French and Algerian Arabic questions and answers match V2 with requested location and POS updates',async()=>{
  const {readFile}=await import('node:fs/promises');
  const fixture=JSON.parse(await readFile(new URL('./fixtures/translations-v2.json',import.meta.url),'utf8'));
  const questions=[...consumerSections,...retailerSections].flatMap(s=>s.questions);
@@ -99,4 +99,32 @@ test('French and Algerian Arabic questions and answers match the translated V2 w
  }
  const result=literalAnswers('consumer',{Q1:'mbo-red',Q5:'other-pack',Q6b:'camel-yellow',Q11:'4'},{Q11:'ar'});
  assert.equal(result.Q11.answer,fixture.Q11.options['4'].ar);
+});
+
+
+test('location choices retain all 98 source entries and reject mismatched region, wilaya or commune',async()=>{
+ const {locations}=await import('../lib/locations');
+ assert.deepEqual(Object.keys(locations),['Centre','Est','Ouest']);
+ assert.equal(Object.values(locations).reduce((n,region)=>n+Object.keys(region).length,0),17);
+ assert.equal(Object.values(locations).flatMap(region=>Object.values(region)).flat().length,98);
+ assert.equal(locations.Centre.TIPAZA.filter(c=>c==='KOLEA').length,1);
+ assert.ok(locations.Centre.ALGER.includes('AIN BENIANE'));
+ for(const id of ['Q0','R1']){
+  assert.ok(questionValid(question(id),{[id]:{region:'Centre',wilaya:'ALGER',commune:'AIN BENIAN'}}));
+  for(const value of [undefined,'ALGER',[],{region:'Centre',wilaya:'ALGER',commune:''},{region:'Est',wilaya:'ALGER',commune:'AIN BENIAN'},{region:'Centre',wilaya:'ALGER',commune:'KOLEA'},{region:'__proto__',wilaya:'constructor',commune:'x'}])assert.ok(!questionValid(question(id),{[id]:value} as Answers));
+ }
+ assert.deepEqual(question('R2').options!.map(o=>o.id),['tobacco','kiosk']);
+ assert.ok(!questionValid(question('R2'),{R2:'grocery'}));assert.ok(!questionValid(question('R2'),{R2:'other'}));
+});
+
+test('participation starts the JSON, retains the introduction language, and refusals have no survey answers',()=>{
+ const base={id:'consent',mode:'consumer' as const,language:'fr' as const,completedAt:'2026-10-12T10:00:00Z',schemaVersion:1 as const};
+ const yes=interviewPayload({...base,participation:{answer:'yes',language:'en'},answers:{Q0:{region:'Centre',wilaya:'ALGER',commune:'AIN BENIAN'}}});
+ assert.equal(Object.keys(yes)[0],'participation');assert.equal(yes.participation?.answer,'Yes');assert.equal(yes.participation?.language,'en');assert.ok(yes.participation?.question.startsWith('Hello,'));
+ assert.deepEqual(yes.answers.Q0.answer,{region:'Centre',wilaya:'ALGER',commune:'AIN BENIAN'});
+ const refusal={...base,participation:{answer:'no' as const,language:'ar' as const},answers:{}};
+ assert.ok(isInterview(refusal));assert.equal(interviewPayload(refusal).participation?.answer,'لا');
+ assert.deepEqual(interviewPayload({...refusal,answers:{Q1:'mbo-red'}}).answers,{});
+ assert.ok(!isInterview({...refusal,answers:{Q1:'mbo-red'}}));
+ assert.ok(!isInterview({...refusal,participation:{answer:'maybe',language:'ar'}}));
 });

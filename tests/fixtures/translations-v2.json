@@ -377,10 +377,6 @@
       "ar": "نوع نقطة البيع"
     },
     "options": {
-      "grocery": {
-        "fr": "Épicerie traditionnelle",
-        "ar": "حانوت / إيبسري تقليدي."
-      },
       "tobacco": {
         "fr": "Bureau Tabac",
         "ar": "محل بيع التبغ.Bureau Tabac"
@@ -388,10 +384,6 @@
       "kiosk": {
         "fr": "Kiosque",
         "ar": "كيوسك."
-      },
-      "other": {
-        "fr": "Autre",
-        "ar": "نوع آخر."
       }
     }
   },
@@ -730,6 +722,22 @@
         "fr": "Autre",
         "ar": "أخرى"
       }
+    }
+  },
+  "Q0": {
+    "workbookId": null,
+    "source": "Communes_List_DTC.xlsx",
+    "text": {
+      "fr": "Où se déroule cet entretien ?",
+      "ar": "وين راهي هاذ المقابلة؟"
+    }
+  },
+  "R1": {
+    "workbookId": null,
+    "source": "Communes_List_DTC.xlsx",
+    "text": {
+      "fr": "Où se déroule cet entretien ?",
+      "ar": "وين راهي هاذ المقابلة؟"
     }
   }
 }

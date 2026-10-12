@@ -1,12 +1,26 @@
 {
+  "participation": {
+    "question": "Bonjour, nous réalisons une courte enquête sur les habitudes d’achat et les préférences des consommateurs. Nous souhaitons simplement recueillir votre avis. Pourriez-vous nous accorder quelques minutes de votre temps ?",
+    "answer": "Oui",
+    "language": "fr"
+  },
   "id": "8a205d0a-3530-4a8b-b898-af966b9d81c2",
   "mode": "consumer",
   "language": "fr",
-  "completedAt": "2026-10-09T11:00:00.000Z",
+  "completedAt": "2026-10-12T10:00:00.000Z",
   "schemaVersion": 1,
   "answers": {
+    "Q0": {
+      "question": "Où se déroule cet entretien ?",
+      "answer": {
+        "region": "Centre",
+        "wilaya": "ALGER",
+        "commune": "AIN BENIAN"
+      },
+      "language": "fr"
+    },
     "Q1": {
-      "question": "Quel produit aviez-vous l’intention d’acheter ?",
+      "question": "Pourriez-vous me préciser s'il vous plait, quelle référence produit souhaitiez-vous acheter en arrivant dans ce point de vente ? (référence principale)",
       "answer": "MBO Red",
       "language": "fr"
     },
@@ -16,28 +30,28 @@
       "language": "en"
     },
     "Q3": {
-      "question": "Le produit recherché était-il disponible ?",
-      "answer": "Non, ni par paquet ni à l’unité",
+      "question": "Avez-vous trouvé le produit que vous recherchiez dans ce point de vente ?",
+      "answer": "Non, ma référence principale/SKU n'était disponible ni en paquet ni à l'unité",
       "language": "fr"
     },
     "Q4": {
-      "question": "Que s’est-il passé lorsque vous l’avez demandé ?",
-      "answer": "Le détaillant a annoncé une rupture",
+      "question": "Et que s’est-il passé lorsque vous avez demandé le produit que vous recherchiez ?",
+      "answer": "Le vendeur m'a dit qu'il était en rupture de stock",
       "language": "fr"
     },
     "Q5": {
-      "question": "Qu’avez-vous finalement fait ?",
-      "answer": "J’achèterai plus tard",
+      "question": "Qu’avez-vous finalement décidé de faire ?",
+      "answer": "J'ai décidé d'achèter plus tard",
       "language": "fr"
     },
     "Q9": {
-      "question": "Comment avez-vous fait ce choix ?",
-      "answer": "Il y avait peu d’options",
+      "question": "Comment décririez-vous votre choix de cette autre référence ?",
+      "answer": "Je l’ai choisie parce que les options disponibles étaient limitées",
       "language": "fr"
     },
     "Q10": {
-      "question": "Si votre produit habituel revient, que ferez-vous probablement ?",
-      "answer": "Revenir à mon produit habituel",
+      "question": "Si votre produit habituel redevenait disponible, que feriez-vous ?",
+      "answer": "Je reviendrai à mon produit habituel",
       "language": "fr"
     }
   }

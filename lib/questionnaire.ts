@@ -1,3 +1,4 @@
+import { locations } from './locations';
 export type Language = 'fr' | 'en' | 'ar';
 export type Mode = 'consumer' | 'retailer';
 export type Text = Record<Language, string>;
@@ -5,7 +6,7 @@ export const t = (fr: string, en: string, ar: string): Text => ({ fr, en, ar });
 export type Answer = string | string[] | Record<string, string>;
 export type Answers = Record<string, Answer>;
 export type Option = { id: string; label: Text };
-export type Question = { id: string; text: Text; type: 'single' | 'multi' | 'sku' | 'number' | 'scale' | 'stock' | 'substitution'; options?: Option[]; max?: number; min?: number; when?: (a: Answers) => boolean };
+export type Question = { id: string; text: Text; type: 'single' | 'multi' | 'sku' | 'number' | 'scale' | 'stock' | 'substitution' | 'location'; options?: Option[]; max?: number; min?: number; when?: (a: Answers) => boolean };
 export type Section = { id: string; title: Text; description: Text; questions: Question[] };
 const o = (id: string, fr: string, en: string, ar: string): Option => ({ id, label: t(fr, en, ar) });
 export const skus = [
@@ -18,7 +19,9 @@ export const switched = (a: Answers) => purchased(a) && typeof a.Q6b === 'string
 export function flaggedSkus(a: Answers) { const grid = a.R3 as Record<string,string> | undefined; return skus.filter(s => grid?.[s.id] === 'out' || grid?.[s.id] === 'stick').slice(0,8); }
 const q = (id: string, text: Text, options: Option[], extra: Partial<Question> = {}): Question => ({ id,text,type:'single',options,...extra });
 const section = (id: string,title: Text,description: Text,questions: Question[]): Section => ({id,title,description,questions});
+const locationText = t('Où se déroule cet entretien ?', 'Where is this interview taking place?', 'وين راهي هاذ المقابلة؟');
 export const consumerSections: Section[] = [
+ section('location',t('Le lieu de l’entretien','Interview location','مكان المقابلة'),t('Sélectionnez la région, la wilaya et la commune.','Select the region, wilaya and commune.','اختار الجهة، الولاية والبلدية.'),[{id:'Q0',text:locationText,type:'location'}]),
  section('intention',t('L’achat prévu','Purchase intent','الشراء المخطط'),t('Commençons par le produit recherché.','Let’s start with the product you came for.','لنبدأ بالمنتج الذي كنت تبحث عنه.'),[
   {id:'Q1',text:t("Pourriez-vous me préciser s'il vous plait, quelle référence produit souhaitiez-vous acheter en arrivant dans ce point de vente ? (référence principale)","Which SKU / variant did you intend to buy at this POS?","أي نوع (ماركة / صنف) كنت ناوي تشري كي جيت لهذا  الحانوت؟ ( النوع الأساسي تاعك؟)"),type:'sku'},
   q('Q2',t("Et quel format achetez-vous habituellement pour votre référence/SKU principale  ?","What format do you usually buy with your main SKU?","وواشنو هو الفورما اللي تشريه عادةً للنوع الأساسي تاعك ؟ (ماركة / صنف)"),formats),
@@ -53,8 +56,9 @@ export const consumerSections: Section[] = [
 
 ];
 export const retailerSections: Section[] = [
+ section('location',t('Le lieu de l’entretien','Interview location','مكان المقابلة'),t('Sélectionnez la région, la wilaya et la commune.','Select the region, wilaya and commune.','اختار الجهة، الولاية والبلدية.'),[{id:'R1',text:locationText,type:'location'}]),
  section('context',t('Le point de vente','Point of sale','نقطة البيع'),t('Situez l’entretien et identifiez le commerce.','Locate the interview and identify the store.','حدّد مكان المقابلة ونوع المتجر.'),[
-  q('R2',t("Type de PDV","What is the POS type?","نوع نقطة البيع"),[o("grocery","Épicerie traditionnelle","Traditional grocery","حانوت / إيبسري تقليدي."),o("tobacco","Bureau Tabac","Tobacco specialist","محل بيع التبغ.Bureau Tabac"),o("kiosk","Kiosque","Kiosk","كيوسك."),o("other","Autre","Other, specify","نوع آخر.")]),
+  q('R2',t("Type de PDV","What is the POS type?","نوع نقطة البيع"),[o("tobacco","Bureau Tabac","Tobacco specialist","محل بيع التبغ.Bureau Tabac"),o("kiosk","Kiosque","Kiosk","كيوسك.")]),
  ]),
  section('stock',t('La disponibilité','Availability snapshot','توفر المنتجات'),t('Un état des lieux pour les 18 références.','A snapshot of all 18 product variants.','حالة التوفر للمنتجات الثمانية عشر.'),[
   {id:'R3',text:t("Pour chaque référence produit, veuillez indiquer sa disponibilité actuelle dans ce point de vente.","Please indicate the current availability status for each SKU at this POS.","بالنسبة لكل منتوج، قولنا إذا راهو متوفر حاليًا في نقطة البيع هذي."),type:'stock'},
@@ -88,6 +92,11 @@ export function activeSections(mode: Mode, answers: Answers): Section[] {
 }
 export function questionValid(q: Question, a: Answers): boolean {
  const value=a[q.id];
+ if(q.type==='location') {
+  if(!value||typeof value!=='object'||Array.isArray(value))return false;
+  const communes=locations[value.region]?.[value.wilaya];
+  return Array.isArray(communes)&&communes.includes(value.commune);
+ }
  if(q.type==='stock') { const v=value as Record<string,string>;return !!v&&skus.every(s=>stockOptions.some(o=>o.id===v[s.id])); }
  if(q.type==='substitution') { const v=value as Record<string,string>;return !!v&&flaggedSkus(a).every(s=>{
   const primary=v[s.id],second=v[s.id+'-second']; const valid=(x:string)=>skus.some(p=>p.id===x)||['other','none'].includes(x);
