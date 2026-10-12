@@ -63,24 +63,24 @@ test('substitution export removes stale Other text while preserving an active se
 });
 
 
-test('JSON exports literal answers with each question language and excludes removed fields',()=>{
+test('JSON exports direct English answers and excludes removed fields',()=>{
  const answers:Answers={Q1:'mbo-red',Q2:'both',Q2b:'other','Q2b-other':'Occasion',Q5:'later',Q13:'male',Q14:'1'};
- const result=literalAnswers('consumer',answers,{Q1:'fr',Q2:'en',Q2b:'ar'},'fr');
- assert.equal(result.Q1.answer,'MBO Red');assert.equal(result.Q1.language,'fr');
- assert.equal(result.Q2.answer,question('Q2').options!.find(o=>o.id==='both')!.label.en);assert.equal(result.Q2.language,'en');
- assert.equal(result.Q2b.answer,question('Q2b').options!.find(o=>o.id==='other')!.label.ar+' — Occasion');
- assert.equal(result.Q5.language,null);assert.ok(!('Q13' in result));assert.ok(!('Q14' in result));
+ const result=literalAnswers('consumer',answers);
+ assert.equal(result.Q1,'MBO Red');
+ assert.equal(result.Q2,question('Q2').options!.find(o=>o.id==='both')!.label.en);
+ assert.equal(result.Q2b,question('Q2b').options!.find(o=>o.id==='other')!.label.en+' — Occasion');
+ assert.equal(result.Q5,'Will buy later');assert.ok(!('Q13' in result));assert.ok(!('Q14' in result));
  const parsed=JSON.parse(interviewsJson([{id:'test',mode:'consumer',language:'en',completedAt:'2026-10-09T10:00:00Z',schemaVersion:1,answers,questionLanguages:{Q2:'en'}}]));
- assert.equal(parsed[0].answers.Q2.language,'en');assert.equal(parsed[0].questionLanguages,undefined);
+ assert.equal(parsed[0].answers.Q2,'Both pack and stick');assert.equal(parsed[0].questionLanguages,undefined);
  assert.ok(isQuestionLanguages({Q2:'en'}));assert.ok(!isQuestionLanguages({Q2:'bad'}));
 });
 test('literal grid and multiple-choice answers preserve labels and free text',()=>{
  const sku=skus[0].id;
  const a:Answers={R3:{[sku]:'out',[skus[1].id]:'full'},R8:{[sku]:'other',[sku+'-other']:'Local brand',[sku+'-second']:'none',[skus[1].id]:'none'},R17:['Winston','Camel']};
- const result=literalAnswers('retailer',a,{R3:'en',R8:'fr',R17:'ar'});
- assert.equal((result.R3.answer as Record<string,string>)['MBO Red'],'Out of stock');
- assert.deepEqual(Object.keys(result.R8.answer as object),['MBO Red']);
- assert.ok(JSON.stringify(result.R8.answer).includes('Local brand'));assert.deepEqual(result.R17.answer,['Winston','Camel']);
+ const result=literalAnswers('retailer',a);
+ assert.equal((result.R3 as Record<string,string>)['MBO Red'],'Out of stock');
+ assert.deepEqual(Object.keys(result.R8 as object),['MBO Red']);
+ assert.ok(JSON.stringify(result.R8).includes('Local brand'));assert.deepEqual(result.R17,['Winston','Camel']);
 });
 
 test('French and Algerian Arabic questions and answers match V2 with requested location and POS updates',async()=>{
@@ -97,8 +97,8 @@ test('French and Algerian Arabic questions and answers match V2 with requested l
    for(const o of options)for(const lang of ['fr','ar'] as const)assert.equal(o.label[lang],fixture[q.id].options[o.id][lang],`${q.id} ${o.id} ${lang}`);
   }
  }
- const result=literalAnswers('consumer',{Q1:'mbo-red',Q5:'other-pack',Q6b:'camel-yellow',Q11:'4'},{Q11:'ar'});
- assert.equal(result.Q11.answer,fixture.Q11.options['4'].ar);
+ const result=literalAnswers('consumer',{Q1:'mbo-red',Q5:'other-pack',Q6b:'camel-yellow',Q11:'4'});
+ assert.equal(result.Q11,question('Q11').options!.find(o=>o.id==='4')!.label.en);
 });
 
 
@@ -117,14 +117,25 @@ test('location choices retain all 98 source entries and reject mismatched region
  assert.ok(!questionValid(question('R2'),{R2:'grocery'}));assert.ok(!questionValid(question('R2'),{R2:'other'}));
 });
 
-test('participation starts the JSON, retains the introduction language, and refusals have no survey answers',()=>{
+test('participation is oui or non at the start of the JSON and refusals have no survey answers',()=>{
  const base={id:'consent',mode:'consumer' as const,language:'fr' as const,completedAt:'2026-10-12T10:00:00Z',schemaVersion:1 as const};
  const yes=interviewPayload({...base,participation:{answer:'yes',language:'en'},answers:{Q0:{region:'Centre',wilaya:'ALGER',commune:'AIN BENIAN'}}});
- assert.equal(Object.keys(yes)[0],'participation');assert.equal(yes.participation?.answer,'Yes');assert.equal(yes.participation?.language,'en');assert.ok(yes.participation?.question.startsWith('Hello,'));
- assert.deepEqual(yes.answers.Q0.answer,{region:'Centre',wilaya:'ALGER',commune:'AIN BENIAN'});
+ assert.equal(Object.keys(yes)[0],'participation');assert.equal(yes.participation,'oui');
+ assert.deepEqual(yes.answers.Q0,{region:'Central',wilaya:'ALGER',commune:'AIN BENIAN'});
  const refusal={...base,participation:{answer:'no' as const,language:'ar' as const},answers:{}};
- assert.ok(isInterview(refusal));assert.equal(interviewPayload(refusal).participation?.answer,'لا');
+ assert.ok(isInterview(refusal));assert.equal(interviewPayload(refusal).participation,'non');
  assert.deepEqual(interviewPayload({...refusal,answers:{Q1:'mbo-red'}}).answers,{});
  assert.ok(!isInterview({...refusal,answers:{Q1:'mbo-red'}}));
  assert.ok(!isInterview({...refusal,participation:{answer:'maybe',language:'ar'}}));
+});
+
+
+test('payload answers are identical for French, English and Arabic interviews',()=>{
+ for(const mode of ['consumer','retailer'] as const){
+  const answers:Answers=mode==='consumer'?{Q0:{region:'Est',wilaya:'ANNABA',commune:'ANNABA'},Q1:'mbo-red',Q2:'both',Q5:'other-pack',Q6b:'camel-yellow',Q7:'both',Q7a:'3',Q7b:'1',Q8:['only','taste'],Q11:'4',Q12:['price']}:{R1:{region:'Ouest',wilaya:'ORAN',commune:'CANASTEL'},R2:'tobacco',R3:{'mbo-red':'out','camel-yellow':'stick'},R8:{'mbo-red':'none','mbo-red-second':'other','mbo-red-other':'ماركة محلية'},R9:'always',R10:'price',R17:['Camel','Winston']};
+  const outputs=['fr','en','ar'].map(language=>interviewPayload({id:'same',mode,language:language as 'fr'|'en'|'ar',completedAt:'2026-10-12T10:00:00Z',schemaVersion:1,participation:{answer:'yes',language:language as 'fr'|'en'|'ar'},questionLanguages:Object.fromEntries(Object.keys(answers).map(id=>[id,language as 'fr'|'en'|'ar'])),answers}));
+  for(const output of outputs){assert.equal(output.participation,'oui');assert.deepEqual(output.answers,outputs[0].answers);}
+  if(mode==='consumer'){assert.equal(outputs[0].answers.Q2,'Both pack and stick');assert.deepEqual(outputs[0].answers.Q8,['Only available option','Similar taste / strength']);}
+  else {assert.equal(outputs[0].answers.R2,'Tobacco specialist');assert.equal((outputs[0].answers.R3 as Record<string,string>)['Camel Filters Yellow'],'Available only by stick');assert.deepEqual((outputs[0].answers.R8 as Record<string,unknown>)['MBO Red'],{primary:'No clear substitute / leaves without buying',secondary:'Other brand, specify — ماركة محلية'});}
+ }
 });

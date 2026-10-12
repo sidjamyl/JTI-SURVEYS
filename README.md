@@ -43,11 +43,11 @@ Source : `Algeria_OOS_Questionnaire_Workbook V2_Translated_ EN FR DZ.xlsx`, four
 
 Les réponses restent en mémoire pendant la saisie et repartent de zéro à chaque réouverture, rechargement ou retour par l’historique du navigateur. Aucun brouillon ni entretien n’est sauvegardé par le formulaire. Les anciens enregistrements locaux ne sont ni utilisés ni supprimés.
 
-Les deux URLs ouvrent le même écran de choix Consommateur / Détaillant, puis une introduction propre au parcours en français, anglais ou darija. « Oui » ouvre la localisation puis les questions. « Non » transmet immédiatement un refus à WinDev et affiche un remerciement. La réponse à l’introduction, avec sa langue, est le premier champ `participation` du JSON.
+Les deux URLs ouvrent le même écran de choix Consommateur / Détaillant, puis une introduction propre au parcours en français, anglais ou darija. « Oui » ouvre la localisation puis les questions. « Non » transmet immédiatement un refus à WinDev et affiche un remerciement. Le premier champ du JSON est `participation: "oui"` ou `participation: "non"`, quelle que soit la langue du formulaire.
 
 L’en-tête contient le logo JTI et un stepper compact pendant le questionnaire. Le choix de langue reste dans le contenu. Aucun export de brouillon ni entretien local.
 
-Après vérification, le bouton « Valider les réponses » transmet un entretien complet via `WL.Execute("Reponse", json)`, puis reste désactivé sur le récapitulatif. Chaque réponse contient `{question, answer, language}`. WinDev gère la sauvegarde et la suite du parcours. En cas d’erreur du pont, le bouton permet de renvoyer le même JSON sans perdre la saisie tant que la page reste ouverte.
+Après vérification, le bouton « Valider les réponses » transmet un entretien complet via `WL.Execute("Reponse", json)`, puis reste désactivé sur le récapitulatif. Chaque code de question contient directement sa réponse, sans intitulé ni langue. Les choix codés sont toujours exportés en anglais ; les noms de produits, wilayas et communes et les textes libres restent inchangés. Les régions sont exportées comme Central / East / West. WinDev gère la sauvegarde et la suite du parcours. En cas d’erreur du pont, le bouton permet de renvoyer le même JSON sans perdre la saisie tant que la page reste ouverte.
 
 ## Photos produit
 
@@ -106,4 +106,4 @@ Les tests navigateur acceptent `SURVEY_TEST_URL` pour vérifier la version dépl
 
 ## Versions dédiées et WinDev Mobile
 
-Les branches `consumer` et `retailer` servent le même formulaire avec choix de parcours, avec un Dockerfile complet pour Dokploy. Le pont reprend `WL.Execute` du dépôt Camel : à la validation finale, `Reponse(json)` reçoit un entretien avec les réponses en clair et leur langue. `window.reponse()` permet aussi la lecture depuis WinDev. Voir [le flow WinDev](docs/WINDEV.md), [les réglages Dokploy](docs/DOKPLOY.md) et [un exemple JSON](docs/example-response.json).
+Les branches `consumer` et `retailer` servent le même formulaire avec choix de parcours, avec un Dockerfile complet pour Dokploy. Le pont reprend `WL.Execute` du dépôt Camel : à la validation finale, `Reponse(json)` reçoit un entretien avec les réponses en clair en anglais. `window.reponse()` permet aussi la lecture depuis WinDev. Voir [le flow WinDev](docs/WINDEV.md), [les réglages Dokploy](docs/DOKPLOY.md) et [un exemple JSON](docs/example-response.json).

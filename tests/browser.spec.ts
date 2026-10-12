@@ -19,8 +19,8 @@ test('consumer branch, switching, three-choice cap, per-question language and di
  await page.getByRole('tab',{name:'العربية'}).click();await expect(page.locator('html')).toHaveAttribute('dir','rtl');await page.getByRole('tab',{name:'FR',exact:true}).click();
  await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();
  await page.getByRole('button',{name:'Valider les réponses',exact:true}).click();await expect(page.getByRole('button',{name:'Validé',exact:true})).toBeDisabled();await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow','100');
- const calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);expect(calls).toHaveLength(1);expect(calls[0][0]).toBe('Reponse');expect(JSON.parse(calls[0][1]).answers.Q2.language).toBe('en');
- const payload=JSON.parse(calls[0][1]);expect(payload.answers.Q8.answer).toHaveLength(3);expect(payload.answers.Q7b.answer).toBe('2');for(const id of ['Q7a','Q13','Q14'])expect(payload.answers[id]).toBeUndefined();expect(payload.answers.Q1.language).toBe('fr');expect(payload.answers.Q2).toMatchObject({answer:'Both pack and stick',language:'en'});await expect(page.locator('.success-panel')).toHaveCount(0);
+ const calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);expect(calls).toHaveLength(1);expect(calls[0][0]).toBe('Reponse');expect(JSON.parse(calls[0][1]).answers.Q2).toBe('Both pack and stick');
+ const payload=JSON.parse(calls[0][1]);expect(payload.answers.Q8).toHaveLength(3);expect(payload.answers.Q7b).toBe('2');for(const id of ['Q7a','Q13','Q14'])expect(payload.answers[id]).toBeUndefined();expect(payload.answers.Q1).toBe('MBO Red');expect(payload.answers.Q2).toBe('Both pack and stick');await expect(page.locator('.success-panel')).toHaveCount(0);
 });
 test('retailer eighteen-SKU stock grid and capped substitution route',async({page})=>{
  await page.goto(base);await beginSurvey(page,'retailer');
@@ -30,7 +30,7 @@ test('retailer eighteen-SKU stock grid and capped substitution route',async({pag
  await page.locator('#question-R7 .answer-option').last().click();await expect(page.locator('.substitution-row')).toHaveCount(8);await expect(page.locator('.substitution-row').first().locator('select').first().locator('option')).toHaveCount(21);for(let i=0;i<8;i++)await page.locator('.substitution-row').nth(i).locator('select').first().selectOption('none');await page.getByRole('button',{name:'Continuer',exact:true}).click();
  await page.locator('#question-R9 .answer-option').nth(2).click();await page.getByRole('button',{name:'Continuer',exact:true}).click();await expect(page.locator('#question-R10')).toHaveCount(0);
  for(const id of ['R16','R17'])await page.locator(`#question-${id} .answer-option`).first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();await page.locator('#question-R18 .answer-option').first().click();await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await page.getByRole('button',{name:'Valider les réponses',exact:true}).click();
- await expect(page.getByRole('button',{name:'Validé',exact:true})).toBeDisabled();await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow','100');const calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);const saved=JSON.parse(calls[0][1]);expect(Object.keys(saved.answers.R8.answer)).toHaveLength(8);expect(saved.answers.R10).toBeUndefined();
+ await expect(page.getByRole('button',{name:'Validé',exact:true})).toBeDisabled();await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow','100');const calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);const saved=JSON.parse(calls[0][1]);expect(Object.keys(saved.answers.R8)).toHaveLength(8);expect(saved.answers.R10).toBeUndefined();
 });
 
 test('mobile stepper stays visible, adapts to branches and supports RTL',async({page})=>{
@@ -78,7 +78,7 @@ test('retailer recommendation branch and no flagged products',async({page})=>{
  await page.locator('#question-R10 .other-field input').fill('Critère local');await page.getByRole('button',{name:'Continuer',exact:true}).click();
  for(const id of ['R16','R17'])await page.locator(`#question-${id} .answer-option`).first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();await page.locator('#question-R18 .answer-option').first().click();
  await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await page.getByRole('button',{name:'Valider les réponses',exact:true}).click();
- const calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);const answers=JSON.parse(calls[0][1]).answers;expect(answers.R8).toBeUndefined();expect(answers.R10.answer).toContain('Critère local');
+ const calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);const answers=JSON.parse(calls[0][1]).answers;expect(answers.R8).toBeUndefined();expect(answers.R10).toContain('Critère local');
 });
 
 
@@ -91,7 +91,7 @@ test('invitation records refusals once, retries the same JSON, and never opens t
  await page.getByRole('button',{name:'Retry sending',exact:true}).click();
  await expect(page.locator('.declined-panel')).toContainText('Your response has been noted');
  const calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);
- expect(calls).toHaveLength(2);expect(calls[0]).toEqual(calls[1]);const payload=JSON.parse(calls[1][1]);expect(Object.keys(payload)[0]).toBe('participation');expect(payload.participation).toMatchObject({answer:'No',language:'en'});expect(payload.answers).toEqual({});expect(payload.mode).toBe('retailer');
+ expect(calls).toHaveLength(2);expect(calls[0]).toEqual(calls[1]);const payload=JSON.parse(calls[1][1]);expect(Object.keys(payload)[0]).toBe('participation');expect(payload.participation).toBe('non');expect(payload.answers).toEqual({});expect(payload.mode).toBe('retailer');
  await expect(page.locator('.declined-panel button')).toHaveCount(0);
 });
 
