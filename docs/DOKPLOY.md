@@ -30,7 +30,7 @@ Créer le projet **JTI Surveys**, environnement **production**, puis deux applic
 
 Dans chaque application, ajouter votre domaine dans **Domains**, chemin `/`, port **8080**, activer HTTPS/Let's Encrypt après avoir pointé le DNS sur ce VPS, puis **Deploy**. Choisir deux hôtes différents pour les deux parcours. Ne pas définir `NEXT_PUBLIC_BASE_PATH` : les services sont servis à la racine. Aucun token Dokploy ne doit être placé dans le dépôt ou dans le navigateur.
 
-Les branches fixent le parcours dans `lib/deployment.ts` : aucune variable de sélection n'est requise. Les deux branches contiennent le Dockerfile complet.
+Les deux branches servent désormais la même application : choix Consommateur / Détaillant, introduction et localisation. Les deux URLs restent actives ; `https://jti-consumer.esi-maint.com` peut être utilisé comme lien commun. Les deux branches contiennent le Dockerfile complet.
 
 ## Image
 
@@ -48,4 +48,4 @@ Les dossiers de développement, les secrets `.env*` et les fichiers Git sont exc
 
 ## Mises à jour
 
-Déployer chaque branche dans son application. Pour ajouter une modification commune, la reporter dans les deux branches en conservant leur valeur `fixedMode`. Aucun entretien ni brouillon n’est enregistré dans le navigateur. WinDev doit récupérer et sauvegarder le JSON via le pont décrit dans `WINDEV.md`.
+Déployer chaque branche dans son application. Pour ajouter une modification commune, la reporter dans les deux branches ; leurs contenus applicatifs restent identiques. Aucun entretien ni brouillon n’est enregistré dans le navigateur. WinDev doit récupérer et sauvegarder le JSON via le pont décrit dans `WINDEV.md`.

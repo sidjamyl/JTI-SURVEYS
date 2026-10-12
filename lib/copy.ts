@@ -1,5 +1,18 @@
 import { t } from './questionnaire';
 export const copy = {
+ choose:t('Choisissez votre questionnaire','Choose your questionnaire','اختار الاستبيان'),
+ chooseHint:t('Sélectionnez le profil de la personne interrogée.','Select the profile of the person being interviewed.','اختار نوع الشخص اللي راك تسقسيه.'),
+ consumerHint:t('Habitudes d’achat et préférences','Shopping habits and preferences','عادات الشراء والتفضيلات'),
+ retailerHint:t('Disponibilité et comportement des clients','Availability and customer behavior','توفّر المنتوجات وتصرّفات الزبائن'),
+ introduction:t('Avant de commencer','Before we begin','قبل ما نبداو'),
+ introConsumer:t('Bonjour, nous réalisons une courte enquête sur les habitudes d’achat et les préférences des consommateurs. Nous souhaitons simplement recueillir votre avis. Pourriez-vous nous accorder quelques minutes de votre temps ?','Hello, we are conducting a short survey about consumers’ shopping habits and preferences. We would simply like to hear your opinion. Could you spare a few minutes of your time?','سلام، رانا حابين نفهمو أكثر عادات الشراء وتفضيلات المستهلكين. رانا حابين غير ناخذو رايك. تقدر تعطينا شوية من وقتك؟'),
+ introRetailer:t('Bonjour, nous réalisons une courte enquête auprès des commerçants afin de mieux comprendre la disponibilité des produits et les habitudes d’achat des clients. Nous souhaitons simplement recueillir votre avis. Pourriez-vous nous accorder quelques minutes de votre temps ?','Hello, we are conducting a short survey with retailers to better understand product availability and customers’ shopping habits. We would simply like to hear your opinion. Could you spare a few minutes of your time?','سلام، رانا حابين نفهمو أكثر مدى توفّر المنتوجات وعادات الشراء تاع الزبائن. رانا حابين غير ناخذو رايك. تقدر تعطينا شوية من وقتك؟'),
+ yes:t('Oui','Yes','إيه'),
+ no:t('Non','No','لا'),
+ thankYou:t('Merci pour votre temps','Thank you for your time','صحّيت على وقتك'),
+ declined:t('Votre réponse a été prise en compte. L’entretien est terminé.','Your response has been noted. The interview is complete.','سجّلنا جوابك. المقابلة كملت.'),
+ region:t('Région','Region','الجهة'),
+ commune:t('Commune','Commune','البلدية'),
  interview:t('Nouvel entretien','New interview','مقابلة جديدة'),
  records:t('Entretiens locaux','Local interviews','المقابلات المحلية'),
  fieldwork:t('Espace terrain','Field workspace','مساحة العمل الميداني'),

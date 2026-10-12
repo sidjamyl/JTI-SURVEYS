@@ -4,7 +4,8 @@ export const DRAFT_KEY='jti-pulse-drafts-v1';
 export const DRAFT_LANGUAGE_KEY='jti-pulse-draft-languages-v1';
 export const RECORD_KEY='jti-pulse-records-v1';
 export type QuestionLanguages = Record<string,Language>;
-export type Interview = { id:string; mode:Mode; language:Language; completedAt:string; answers:Answers; questionLanguages?:QuestionLanguages; schemaVersion:1 };
+export type Participation = { answer:'yes'|'no'; language:Language };
+export type Interview = { id:string; mode:Mode; language:Language; completedAt:string; answers:Answers; questionLanguages?:QuestionLanguages; participation?:Participation; schemaVersion:1 };
 export function isQuestionLanguages(value:unknown):value is QuestionLanguages {
  return !!value&&typeof value==='object'&&!Array.isArray(value)&&Object.values(value).every(v=>v==='fr'||v==='en'||v==='ar');
 }
@@ -13,7 +14,7 @@ export function isAnswers(value:unknown): value is Answers {
 }
 export function isInterview(value:unknown):value is Interview {
  if(!value||typeof value!=='object')return false;const r=value as Interview;
- return typeof r.id==='string'&&['consumer','retailer'].includes(r.mode)&&['fr','en','ar'].includes(r.language)&&typeof r.completedAt==='string'&&!Number.isNaN(Date.parse(r.completedAt))&&isAnswers(r.answers)&&(r.questionLanguages===undefined||isQuestionLanguages(r.questionLanguages))&&r.schemaVersion===1&&activeSections(r.mode,r.answers).every(s=>s.questions.every(q=>questionValid(q,r.answers)));
+ return typeof r.id==='string'&&['consumer','retailer'].includes(r.mode)&&['fr','en','ar'].includes(r.language)&&typeof r.completedAt==='string'&&!Number.isNaN(Date.parse(r.completedAt))&&isAnswers(r.answers)&&(r.questionLanguages===undefined||isQuestionLanguages(r.questionLanguages))&&r.schemaVersion===1&&(r.participation===undefined||(['yes','no'].includes(r.participation?.answer)&&['fr','en','ar'].includes(r.participation?.language)))&&(r.participation?.answer==='no'?Object.keys(r.answers).length===0:activeSections(r.mode,r.answers).every(s=>s.questions.every(q=>questionValid(q,r.answers))));
 }
 export function literalAnswers(mode:Mode,answers:Answers,languages:QuestionLanguages={},fallback:Language='fr') {
  return Object.fromEntries(activeSections(mode,answers).flatMap(s=>s.questions).filter(q=>answers[q.id]!==undefined).map(q=>{
@@ -36,8 +37,8 @@ export function literalAnswers(mode:Mode,answers:Answers,languages:QuestionLangu
  }));
 }
 export function interviewPayload(r:Interview) {
- const {questionLanguages,...record}=r;
- return {...record,answers:literalAnswers(r.mode,r.answers,questionLanguages,r.language)};
+ const {questionLanguages,participation,...record}=r;
+ return {...(participation?{participation:{question:copy[r.mode==='consumer'?'introConsumer':'introRetailer'][participation.language],answer:copy[participation.answer][participation.language],language:participation.language}}:{}),...record,answers:participation?.answer==='no'?{}:literalAnswers(r.mode,r.answers,questionLanguages,r.language)};
 }
 export function interviewsJson(records:Interview[]) {
  return JSON.stringify(records.map(interviewPayload),null,2);
