@@ -6,9 +6,9 @@ Référence consultée : `sidjamyl/camel`, `app/lib/windev.ts`. Camel envoie `WL
 
 ## Déroulement
 
-1. L'application WinDev choisit le parcours et charge l'URL du service `consumer` ou `retailer` dans son champ d'affichage HTML.
+1. L’application WinDev charge le lien commun `https://jti-consumer.esi-maint.com` dans son champ d’affichage HTML. L’URL `https://jti-details.esi-maint.com` sert temporairement la même application.
 2. Dans ce champ, autoriser JavaScript et « Autoriser l'appel de WLangage depuis le code HTML (fonction JavaScript WL.Execute) ». Charger uniquement l'URL de confiance du formulaire JTI dans ce champ.
-3. Le site ouvre directement Q1 ou R2, affiche le stepper et gère les validations et les langues. La confirmation de participation consommateur est intégrée au début du formulaire.
+3. Le site propose Consommateur / Détaillant, puis l’introduction du parcours. « Oui » ouvre la localisation (Q0 / R1 : région, wilaya, commune), puis le questionnaire. « Non » envoie immédiatement un JSON de refus et affiche un remerciement. La confirmation fumeur / 19 ans ou plus reste obligatoire pour le consommateur.
 4. L'utilisateur vérifie les réponses, puis appuie sur « Valider les réponses ».
 5. Le site valide, puis appelle exactement :
 
@@ -41,7 +41,10 @@ Voir `docs/example-response.json`. Chaque réponse contient `question`, `answer`
 - Plusieurs réponses : tableau de libellés.
 - R3 : objet nom de produit → libellé de disponibilité.
 - R8 : objet nom de produit → `{primary, secondary?}`, noms des références ou choix explicites, avec la précision saisie pour « Autre ».
-- Les réponses de branches masquées, Q13/Q14 et R1 sont exclues.
+- Le premier champ `participation` contient `{question, answer, language}` : texte d’introduction, Oui/Non dans la langue choisie et code de langue. Cette langue reste celle du choix initial, même si la langue change ensuite.
+- Un refus contient `participation` avec Non, les métadonnées de l’entretien et `answers: {}`. Il passe par le même appel `Reponse` et le même mécanisme de réessai.
+- Q0 (consommateur) / R1 (détaillant) contiennent `{region, wilaya, commune}`, avec les valeurs exactes du classeur.
+- Les réponses de branches masquées et Q13/Q14 sont exclues.
 - Le pont WinDev reçoit **un seul objet**, avec les réponses de l’entretien.
 
 ## Erreurs et limites
@@ -58,4 +61,4 @@ Documentation PC SOFT : [champ d'affichage HTML / WL.Execute](https://doc.pcsoft
 
 Les réponses et la langue de chaque réponse restent uniquement en mémoire pendant la session. Aucun brouillon ni entretien n’est écrit dans le stockage du navigateur. Une réouverture, un rechargement ou un retour via le cache d’historique repart de zéro. Les anciens entretiens stockés par les versions précédentes ne sont ni utilisés ni supprimés.
 
-Après validation, le récapitulatif reste affiché, le bouton est désactivé et le stepper passe à 100 %. Aucun écran final, bouton de nouvel entretien ou liste locale : WinDev gère la suite et la sauvegarde.
+Après validation, le récapitulatif reste affiché, le bouton est désactivé et le stepper passe à 100 %. Après un refus, un remerciement termine le parcours. Aucun bouton de nouvel entretien ni liste locale : WinDev gère la suite et la sauvegarde.

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Check, Search, Package, Minus, Plus } from 'lucide-react';
 import productImages from '@/public/products/images.json';
+import { locations } from '@/lib/locations';
 import { copy } from '@/lib/copy';
 import { flaggedSkus, skus, stockOptions, type Answers, type Answer, type Question, type Language } from '@/lib/questionnaire';
 export function ProductVisual({id,small=false,lang}:{id:string;small?:boolean;lang:Language}) {
@@ -26,6 +27,11 @@ export function QuestionField({question:q,answers:a,lang,set,invalid}:{question:
     <input type={q.type==='multi'?'checkbox':'radio'} name={q.id} value={option.id} checked={checked} disabled={limit} onChange={()=>set(q.id,q.type==='multi'?(checked?(value as string[]).filter(v=>v!==option.id):[...(Array.isArray(value)?value:[]),option.id]):option.id)}/>
     <span className={`choice-mark ${q.type==='multi'?'square':''}`}>{checked&&<Check size={13}/>}</span><span><bdi>{option.label[lang]}</bdi></span>
    </label>;})}
+  </div>}
+  {q.type==='location'&&<div className="location-fields">
+   <label>{c('region')}<select value={grid.region??''} onChange={e=>set(q.id,{region:e.target.value,wilaya:'',commune:''})}><option value="">{c('select')}</option>{Object.keys(locations).map(region=><option key={region} value={region}>{region}</option>)}</select></label>
+   <label>{c('wilaya')}<select disabled={!grid.region} value={grid.wilaya??''} onChange={e=>set(q.id,{...grid,wilaya:e.target.value,commune:''})}><option value="">{c('select')}</option>{Object.keys(locations[grid.region]??{}).map(wilaya=><option key={wilaya} value={wilaya}>{wilaya}</option>)}</select></label>
+   <label>{c('commune')}<select disabled={!grid.wilaya} value={grid.commune??''} onChange={e=>setGrid('commune',e.target.value)}><option value="">{c('select')}</option>{(locations[grid.region]?.[grid.wilaya]??[]).map(commune=><option key={commune} value={commune}>{commune}</option>)}</select></label>
   </div>}
   {q.type==='sku'&&<><div className="product-search"><Search size={17}/><input aria-label={c('search')} placeholder={c('search')} value={search} onChange={e=>setSearch(e.target.value)} /></div><div className="product-grid">
    {skus.filter(s=>(s.name+' '+s.brand).toLowerCase().includes(search.trim().toLowerCase())).map(s=><label key={s.id} className={`product-card ${value===s.id?'selected':''}`}><input type="radio" name={q.id} checked={value===s.id} onChange={()=>set(q.id,s.id)}/><span className="product-check">{value===s.id?<Check size={12}/>:null}</span><ProductVisual id={s.id} lang={lang}/><span className="product-brand"><bdi>{s.brand}</bdi></span><span className="product-name"><bdi>{s.name}</bdi></span></label>)}

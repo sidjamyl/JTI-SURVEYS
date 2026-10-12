@@ -36,13 +36,16 @@ Source : `Algeria_OOS_Questionnaire_Workbook V2_Translated_ EN FR DZ.xlsx`, four
 - R3 : 18 statuts obligatoires. R8 : uniquement rupture ou unité, huit premières références selon le classement de ventes. « Aucun substitut / repart sans achat » est conservé ; deuxième choix facultatif et distinct du premier.
 - R10 : uniquement si R9 indique une recommandation.
 - Les réponses masquées après modification sont conservées pendant la session, puis exclues de l’entretien final.
-- À la demande utilisateur, Q13/Q14 (sexe et âge) et R1 (wilaya, ville, identifiant POS) sont retirés. R2 (type de point de vente) est conservé.
+- Q13/Q14 (sexe et âge) restent retirés. La localisation est rétablie au début des deux parcours : Q0 consommateur / R1 détaillant, avec région, wilaya et commune. R2 propose uniquement Bureau Tabac et Kiosque.
+- `lib/locations.ts` reprend les 98 combinaisons distinctes de `Communes_List_DTC.xlsx` (3 régions, 17 wilayas). Seules les lignes exactement identiques sont dédupliquées ; les variantes orthographiques sont conservées. Les listes sont liées et les choix incompatibles sont rejetés.
 
 ## Session et transmission à WinDev
 
 Les réponses restent en mémoire pendant la saisie et repartent de zéro à chaque réouverture, rechargement ou retour par l’historique du navigateur. Aucun brouillon ni entretien n’est sauvegardé par le formulaire. Les anciens enregistrements locaux ne sont ni utilisés ni supprimés.
 
-L’en-tête contient uniquement le logo JTI et un stepper compact. Le choix de langue reste dans le formulaire. Aucun bouton Retour à la première section, export de brouillon, entretien local ou écran final.
+Les deux URLs ouvrent le même écran de choix Consommateur / Détaillant, puis une introduction propre au parcours en français, anglais ou darija. « Oui » ouvre la localisation puis les questions. « Non » transmet immédiatement un refus à WinDev et affiche un remerciement. La réponse à l’introduction, avec sa langue, est le premier champ `participation` du JSON.
+
+L’en-tête contient le logo JTI et un stepper compact pendant le questionnaire. Le choix de langue reste dans le contenu. Aucun export de brouillon ni entretien local.
 
 Après vérification, le bouton « Valider les réponses » transmet un entretien complet via `WL.Execute("Reponse", json)`, puis reste désactivé sur le récapitulatif. Chaque réponse contient `{question, answer, language}`. WinDev gère la sauvegarde et la suite du parcours. En cas d’erreur du pont, le bouton permet de renvoyer le même JSON sans perdre la saisie tant que la page reste ouverte.
 
@@ -103,4 +106,4 @@ Les tests navigateur acceptent `SURVEY_TEST_URL` pour vérifier la version dépl
 
 ## Versions dédiées et WinDev Mobile
 
-Les branches `consumer` et `retailer` ouvrent directement leur formulaire, avec un Dockerfile complet pour Dokploy. Le pont reprend `WL.Execute` du dépôt Camel : à la validation finale, `Reponse(json)` reçoit un entretien avec les réponses en clair et leur langue. `window.reponse()` permet aussi la lecture depuis WinDev. Voir [le flow WinDev](docs/WINDEV.md), [les réglages Dokploy](docs/DOKPLOY.md) et [un exemple JSON](docs/example-response.json).
+Les branches `consumer` et `retailer` servent le même formulaire avec choix de parcours, avec un Dockerfile complet pour Dokploy. Le pont reprend `WL.Execute` du dépôt Camel : à la validation finale, `Reponse(json)` reçoit un entretien avec les réponses en clair et leur langue. `window.reponse()` permet aussi la lecture depuis WinDev. Voir [le flow WinDev](docs/WINDEV.md), [les réglages Dokploy](docs/DOKPLOY.md) et [un exemple JSON](docs/example-response.json).
