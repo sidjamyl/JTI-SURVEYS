@@ -35,15 +35,16 @@ La procédure WinDev `Reponse(sJSON est une chaîne)` reçoit directement le JSO
 
 ## JSON
 
-Voir `docs/example-response.json`. Chaque réponse contient `question`, `answer` et `language` (`fr`, `en`, `ar`, ou `null` pour les anciens entretiens sans historique). La langue correspond au dernier changement de la réponse, pas à la langue de l'écran final.
+Voir `docs/example-response.json`. Chaque code dans `answers` contient directement la réponse : `answers.Q2 = "Full pack"`, sans objet `question / answer / language`. Les choix codés sont toujours en anglais, même lorsque le formulaire est rempli en français ou en arabe. Le champ `language` au niveau de l’entretien indique uniquement la langue de l’écran final.
 
 - Une réponse simple : chaîne de libellé ; un produit : nom de la référence.
 - Plusieurs réponses : tableau de libellés.
 - R3 : objet nom de produit → libellé de disponibilité.
 - R8 : objet nom de produit → `{primary, secondary?}`, noms des références ou choix explicites, avec la précision saisie pour « Autre ».
-- Le premier champ `participation` contient `{question, answer, language}` : texte d’introduction, Oui/Non dans la langue choisie et code de langue. Cette langue reste celle du choix initial, même si la langue change ensuite.
-- Un refus contient `participation` avec Non, les métadonnées de l’entretien et `answers: {}`. Il passe par le même appel `Reponse` et le même mécanisme de réessai.
-- Q0 (consommateur) / R1 (détaillant) contiennent `{region, wilaya, commune}`, avec les valeurs exactes du classeur.
+- Le premier champ `participation` vaut exactement `"oui"` ou `"non"` dans toutes les langues.
+- Un refus contient `participation: "non"`, les métadonnées de l’entretien et `answers: {}`. Il passe par le même appel `Reponse` et le même mécanisme de réessai.
+- Q0 (consommateur) / R1 (détaillant) contiennent `{region, wilaya, commune}`, avec les wilayas et communes exactes du classeur ; la région est Central / East / West.
+- Les précisions libres restent telles que saisies ; aucune traduction automatique de texte libre n’est effectuée.
 - Les réponses de branches masquées et Q13/Q14 sont exclues.
 - Le pont WinDev reçoit **un seul objet**, avec les réponses de l’entretien.
 

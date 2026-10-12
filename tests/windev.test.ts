@@ -10,7 +10,7 @@ test('WinDev receives the JSON through Reponse exactly as Camel sends Score',()=
  Object.defineProperty(globalThis,'window',{configurable:true,value:mock});
  try {
   assert.equal(publishResponse(record),true);assert.equal(calls.length,1);assert.equal(calls[0][0],'Reponse');
-  const payload=JSON.parse(calls[0][1]);assert.equal(payload.id,'fixed-id');assert.equal(payload.answers.Q1.answer,'MBO Red');assert.equal(payload.answers.Q2.language,'en');assert.equal(payload.questionLanguages,undefined);
+  const payload=JSON.parse(calls[0][1]);assert.equal(payload.id,'fixed-id');assert.equal(payload.answers.Q1,'MBO Red');assert.equal(payload.answers.Q2,'Both pack and stick');assert.equal(payload.questionLanguages,undefined);
   assert.equal(calls.length,1);
  }finally{Object.defineProperty(globalThis,'window',{configurable:true,value:original});}
 });

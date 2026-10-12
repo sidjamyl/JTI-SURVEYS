@@ -16,29 +16,28 @@ export function isInterview(value:unknown):value is Interview {
  if(!value||typeof value!=='object')return false;const r=value as Interview;
  return typeof r.id==='string'&&['consumer','retailer'].includes(r.mode)&&['fr','en','ar'].includes(r.language)&&typeof r.completedAt==='string'&&!Number.isNaN(Date.parse(r.completedAt))&&isAnswers(r.answers)&&(r.questionLanguages===undefined||isQuestionLanguages(r.questionLanguages))&&r.schemaVersion===1&&(r.participation===undefined||(['yes','no'].includes(r.participation?.answer)&&['fr','en','ar'].includes(r.participation?.language)))&&(r.participation?.answer==='no'?Object.keys(r.answers).length===0:activeSections(r.mode,r.answers).every(s=>s.questions.every(q=>questionValid(q,r.answers))));
 }
-export function literalAnswers(mode:Mode,answers:Answers,languages:QuestionLanguages={},fallback:Language='fr') {
+export function literalAnswers(mode:Mode,answers:Answers) {
  return Object.fromEntries(activeSections(mode,answers).flatMap(s=>s.questions).filter(q=>answers[q.id]!==undefined).map(q=>{
-  const language=languages[q.id]??null;
-  const lang=language??fallback;
   const value=answers[q.id];
   const skuName=(id:string)=>skus.find(s=>s.id===id)?.name??id;
-  const label=(id:string)=>q.options?.find(o=>o.id===id)?.label[lang]??id;
+  const label=(id:string)=>q.options?.find(o=>o.id===id)?.label.en??id;
   const choice=(id:string)=>id==='other'?`${label(id)} — ${answers[q.id+'-other']??''}`:label(id);
   let answer:unknown=value;
   if(q.type==='sku')answer=skuName(value as string);
-  else if(q.type==='stock')answer=Object.fromEntries(Object.entries(value as Record<string,string>).map(([id,status])=>[skuName(id),stockOptions.find(o=>o.id===status)?.label[lang]??status]));
+  else if(q.type==='location'){const location=value as Record<string,string>;answer={...location,region:({Centre:'Central',Est:'East',Ouest:'West'} as Record<string,string>)[location.region]??location.region};}
+  else if(q.type==='stock')answer=Object.fromEntries(Object.entries(value as Record<string,string>).map(([id,status])=>[skuName(id),stockOptions.find(o=>o.id===status)?.label.en??status]));
   else if(q.type==='substitution'){
    const grid=value as Record<string,string>;
-   const substitute=(id:string,key:string)=>id==='other'?`${copy.otherBrand[lang]} — ${grid[key+'-other']??''}`:id==='none'?copy.none[lang]:skuName(id);
+   const substitute=(id:string,key:string)=>id==='other'?`${copy.otherBrand.en} — ${grid[key+'-other']??''}`:id==='none'?copy.none.en:skuName(id);
    answer=Object.fromEntries(flaggedSkus(answers).filter(s=>grid[s.id]).map(s=>[s.name,{primary:substitute(grid[s.id],s.id),...(grid[s.id+'-second']?{secondary:substitute(grid[s.id+'-second'],s.id)}:{})}]));
   }
   else if(q.options)answer=Array.isArray(value)?value.map(choice):choice(value as string);
-  return [q.id,{question:q.text[lang],answer,language}];
+  return [q.id,answer];
  }));
 }
 export function interviewPayload(r:Interview) {
  const {questionLanguages,participation,...record}=r;
- return {...(participation?{participation:{question:copy[r.mode==='consumer'?'introConsumer':'introRetailer'][participation.language],answer:copy[participation.answer][participation.language],language:participation.language}}:{}),...record,answers:participation?.answer==='no'?{}:literalAnswers(r.mode,r.answers,questionLanguages,r.language)};
+ return {...(participation?{participation:participation.answer==='yes'?'oui':'non'}:{}),...record,answers:participation?.answer==='no'?{}:literalAnswers(r.mode,r.answers)};
 }
 export function interviewsJson(records:Interview[]) {
  return JSON.stringify(records.map(interviewPayload),null,2);
