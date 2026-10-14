@@ -32,6 +32,8 @@ export const copy = {
  confirm:t('Valider les réponses','Confirm answers','أكّد الإجابات'),
  confirmed:t('Validé','Confirmed','تم التأكيد'),
  edit:t('Modifier','Edit','عدّل'),
+ phoneError:t('Saisissez un numéro de téléphone valide, avec 7 à 15 chiffres.','Enter a valid phone number with 7 to 15 digits.','اكتب رقم هاتف صحيح فيه من 7 حتى 15 رقم.'),
+ notProvided:t('Non renseigné','Not provided','ما تعمّرش'),
  required:t('Répondez à cette question pour continuer.','Answer this question to continue.','أجب عن هذا السؤال للمتابعة.'),
  eligibility:t('Confirmez les critères de participation pour commencer.','Confirm participant eligibility to begin.','أكّد شروط المشاركة للبدء.'),
  search:t('Rechercher une marque ou un produit…','Search a brand or product…','ابحث عن علامة أو منتج…'),

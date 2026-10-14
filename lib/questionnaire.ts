@@ -6,7 +6,7 @@ export const t = (fr: string, en: string, ar: string): Text => ({ fr, en, ar });
 export type Answer = string | string[] | Record<string, string>;
 export type Answers = Record<string, Answer>;
 export type Option = { id: string; label: Text };
-export type Question = { id: string; text: Text; type: 'single' | 'multi' | 'sku' | 'number' | 'scale' | 'stock' | 'substitution' | 'location'; options?: Option[]; max?: number; min?: number; when?: (a: Answers) => boolean };
+export type Question = { id: string; text: Text; type: 'single' | 'multi' | 'sku' | 'number' | 'scale' | 'stock' | 'substitution' | 'location' | 'tel'; options?: Option[]; max?: number; min?: number; when?: (a: Answers) => boolean };
 export type Section = { id: string; title: Text; description: Text; questions: Question[] };
 const o = (id: string, fr: string, en: string, ar: string): Option => ({ id, label: t(fr, en, ar) });
 export const skus = [
@@ -54,6 +54,11 @@ export const consumerSections: Section[] = [
   q('Q12',t("Qu'est-ce qui vous ferait revenir à votre marque principale ?","What would make you return to your original brand?","واش اللي يقدر يخليك ترجع للماركة تاعك الاصلية؟"),[o("availability","Une meilleure disponibilité","Better availability","تكون متوفرة أكثر."),o("price","Un prix identique / stable","Same / stable price","يكون السعر نفسه و يبقى مستقر."),o("quality","Une meilleure fraîcheur / qualité","Better freshness / quality","تكون الجودة أحسن."),o("stick","Disponibilité à l'unité","Available by stick","تكون متوفرة بالڤوارا."),o("recommend","La recommandation du vendeur","Retailer recommendation","مول الحانوت ينصحني بيها."),o("return","Rien de particulier, je reviendrai de toute façon","Nothing, I will return anyway","ما كاين حتى سبب خاص، نرجعلها على كل حال."),o("stay","Rien de particulier, je pourrais continuer avec la nouvelle marque","Nothing, I may continue with the new brand","ما كاين حتى سبب خاص، ونقدر نواصل نشري الماركة الجديدة."),o("other","Autre","Other, specify","حاجة أخرى.")],{type:'multi',when:switched}),
  ]),
 
+ section('profile',t('Informations du client','Customer details','معلومات الزبون'),t('Le numéro de téléphone est facultatif.','The phone number is optional.','رقم الهاتف اختياري.'),[
+  q('Q13',t('Genre','Gender','الجنس'),[o('male','Homme','Male','راجل'),o('female','Femme','Female','مرا')]),
+  q('Q14',t("Tranche d’âge",'Age group','الفئة العمرية'),[o('0','19-24 ans','19-24','19-24 عام'),o('1','25-34 ans','25-34','25-34 عام'),o('2','35-44 ans','35-44','35-44 عام'),o('3','45 ans et plus','45+','45 عام وفوق')]),
+  {id:'Q15',text:t('Numéro de téléphone du client (facultatif)','Customer phone number (optional)','رقم هاتف الزبون (اختياري)'),type:'tel'},
+ ]),
 ];
 export const retailerSections: Section[] = [
  section('location',t('Le lieu de l’entretien','Interview location','مكان المقابلة'),t('Sélectionnez la région, la wilaya et la commune.','Select the region, wilaya and commune.','اختار الجهة، الولاية والبلدية.'),[{id:'R1',text:locationText,type:'location'}]),
@@ -92,6 +97,7 @@ export function activeSections(mode: Mode, answers: Answers): Section[] {
 }
 export function questionValid(q: Question, a: Answers): boolean {
  const value=a[q.id];
+ if(q.type==='tel')return value===undefined||(typeof value==='string'&&(!value.trim()||(/^\+?[0-9 ()-]+$/.test(value.trim())&&/^\d{7,15}$/.test(value.replace(/\D/g,'')))));
  if(q.type==='location') {
   if(!value||typeof value!=='object'||Array.isArray(value))return false;
   const communes=locations[value.region]?.[value.wilaya];
@@ -114,6 +120,7 @@ export function questionValid(q: Question, a: Answers): boolean {
 export function cleanAnswers(mode:Mode,a:Answers):Answers {
  const cleaned:Answers={};
  for(const s of activeSections(mode,a))for(const q of s.questions) {
+  if(q.type==='tel'){const phone=a[q.id];if(typeof phone==='string'&&phone.trim())cleaned[q.id]=phone.trim();continue;}
   if(q.id==='R8') {const grid=a.R8 as Record<string,string>;const v:Record<string,string>={};for(const sku of flaggedSkus(a))for(const suffix of ['','-second','-other'])if(grid?.[sku.id+suffix]&&(suffix!=='-other'||[grid[sku.id],grid[sku.id+'-second']].includes('other')))v[sku.id+suffix]=grid[sku.id+suffix];cleaned.R8=v;}
   else {cleaned[q.id]=a[q.id];const value=a[q.id];if(value==='other'||(Array.isArray(value)&&value.includes('other')))cleaned[q.id+'-other']=a[q.id+'-other'];}
  }

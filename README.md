@@ -36,7 +36,8 @@ Source : `Algeria_OOS_Questionnaire_Workbook V2_Translated_ EN FR DZ.xlsx`, four
 - R3 : 18 statuts obligatoires. R8 : uniquement rupture ou unité, huit premières références selon le classement de ventes. « Aucun substitut / repart sans achat » est conservé ; deuxième choix facultatif et distinct du premier.
 - R10 : uniquement si R9 indique une recommandation.
 - Les réponses masquées après modification sont conservées pendant la session, puis exclues de l’entretien final.
-- Q13/Q14 (sexe et âge) restent retirés. La localisation est rétablie au début des deux parcours : Q0 consommateur / R1 détaillant, avec région, wilaya et commune. R2 propose uniquement Bureau Tabac et Kiosque.
+- Q15 : téléphone du client facultatif, dans les informations du consommateur. Les champs vides sont omis du JSON ; les numéros sont transmis comme chaînes, avec le zéro initial ou le préfixe international.
+- Q13/Q14 : sexe et tranche d’âge du consommateur rétablis, réponses obligatoires. La localisation est rétablie au début des deux parcours : Q0 consommateur / R1 détaillant, avec région, wilaya et commune. R2 propose uniquement Bureau Tabac et Kiosque.
 - `lib/locations.ts` reprend les 98 combinaisons distinctes de `Communes_List_DTC.xlsx` (3 régions, 17 wilayas). Seules les lignes exactement identiques sont dédupliquées ; les variantes orthographiques sont conservées. Les listes sont liées et les choix incompatibles sont rejetés.
 
 ## Session et transmission à WinDev
