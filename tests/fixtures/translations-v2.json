@@ -739,5 +739,55 @@
       "fr": "Où se déroule cet entretien ?",
       "ar": "وين راهي هاذ المقابلة؟"
     }
+  },
+  "Q15": {
+    "workbookId": null,
+    "source": "Requested optional customer phone",
+    "text": {
+      "fr": "Numéro de téléphone du client (facultatif)",
+      "ar": "رقم هاتف الزبون (اختياري)"
+    }
+  },
+  "Q13": {
+    "workbookId": "Q15",
+    "text": {
+      "fr": "Genre",
+      "ar": "الجنس"
+    },
+    "options": {
+      "male": {
+        "fr": "Homme",
+        "ar": "راجل"
+      },
+      "female": {
+        "fr": "Femme",
+        "ar": "مرا"
+      }
+    }
+  },
+  "Q14": {
+    "workbookId": "Q16",
+    "text": {
+      "fr": "Tranche d’âge",
+      "ar": "الفئة العمرية"
+    },
+    "options": {
+      "0": {
+        "fr": "19-24 ans",
+        "ar": "19-24 عام"
+      },
+      "1": {
+        "fr": "25-34 ans",
+        "ar": "25-34 عام"
+      },
+      "2": {
+        "fr": "35-44 ans",
+        "ar": "35-44 عام"
+      },
+      "3": {
+        "fr": "45 ans et plus",
+        "ar": "45 عام وفوق"
+      }
+    }
   }
 }

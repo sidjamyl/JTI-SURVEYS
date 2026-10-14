@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { beginSurvey, fillLocation } from './fill-survey';
+import { beginSurvey, fillLocation, fillToReview } from './fill-survey';
 test.skip(!!process.env.SURVEY_TEST_MODE,'Dedicated branch uses branch.spec.ts');
 const base=process.env.SURVEY_TEST_URL || 'http://localhost:3002';
 test.beforeEach(async({page})=>{await page.addInitScript(()=>{const w=window as typeof window & {nativeCalls:[string,string][]};w.nativeCalls=[];w.WL={Execute:(name,json)=>w.nativeCalls.push([name,json])};});});
@@ -17,10 +17,11 @@ test('consumer branch, switching, three-choice cap, per-question language and di
  await page.locator('#question-Q9 .answer-option').first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
  await page.locator('#question-Q10 .answer-option').first().click();await page.locator('#question-Q11 label').nth(3).click();await page.locator('#question-Q12 .answer-option').first().click();
  await page.getByRole('tab',{name:'العربية'}).click();await expect(page.locator('html')).toHaveAttribute('dir','rtl');await page.getByRole('tab',{name:'FR',exact:true}).click();
+ await page.getByRole('button',{name:'Continuer',exact:true}).click();await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await expect(page.locator('.field-error')).toHaveCount(2);await expect(page.locator('#question-Q15 input')).toHaveValue('');await page.locator('#question-Q13 input[value=female]').check({force:true});await page.locator('#question-Q14 input[value="1"]').check({force:true});
  await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();
  await page.getByRole('button',{name:'Valider les réponses',exact:true}).click();await expect(page.getByRole('button',{name:'Validé',exact:true})).toBeDisabled();await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow','100');
  const calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);expect(calls).toHaveLength(1);expect(calls[0][0]).toBe('Reponse');expect(JSON.parse(calls[0][1]).answers.Q2).toBe('Both pack and stick');
- const payload=JSON.parse(calls[0][1]);expect(payload.answers.Q8).toHaveLength(3);expect(payload.answers.Q7b).toBe('2');for(const id of ['Q7a','Q13','Q14'])expect(payload.answers[id]).toBeUndefined();expect(payload.answers.Q1).toBe('MBO Red');expect(payload.answers.Q2).toBe('Both pack and stick');await expect(page.locator('.success-panel')).toHaveCount(0);
+ const payload=JSON.parse(calls[0][1]);expect(payload.answers.Q8).toHaveLength(3);expect(payload.answers.Q7b).toBe('2');expect(payload.answers.Q7a).toBeUndefined();expect(payload.answers.Q13).toBe('Female');expect(payload.answers.Q14).toBe('25-34');expect(payload.answers.Q1).toBe('MBO Red');expect(payload.answers.Q2).toBe('Both pack and stick');await expect(page.locator('.success-panel')).toHaveCount(0);
 });
 test('retailer eighteen-SKU stock grid and capped substitution route',async({page})=>{
  await page.goto(base);await beginSurvey(page,'retailer');
@@ -104,4 +105,17 @@ test('location selectors reset dependent choices and reject missing values in an
  await selects.nth(1).selectOption('ORAN');await selects.nth(2).selectOption('CANASTEL');await selects.nth(1).selectOption('TLEMCEN');await expect(selects.nth(2)).toHaveValue('');
  await page.getByRole('tab',{name:'العربية'}).click();await expect(page.locator('html')).toHaveAttribute('dir','rtl');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await selects.nth(2).selectOption('TLEMCEN');await page.getByRole('button',{name:'تابع',exact:true}).click();await expect(page.locator('#question-Q1')).toBeVisible();
+});
+
+
+test('optional customer phone can be omitted or corrected and reaches WinDev as a string',async({page})=>{
+ await page.goto(base);await fillToReview(page,'consumer');
+ await page.getByRole('button',{name:'Valider les réponses',exact:true}).click();
+ let calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);expect(JSON.parse(calls[0][1]).answers.Q15).toBeUndefined();
+ await page.reload();await fillToReview(page,'consumer');
+ await page.locator('.review-section').filter({hasText:'Informations du client'}).getByRole('button',{name:'Modifier',exact:true}).click();
+ const phone=page.locator('#question-Q15 input');await expect(phone).toHaveAttribute('type','tel');await expect(phone).toHaveAttribute('dir','ltr');
+ await phone.fill('abc');await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await expect(page.locator('#Q15-error')).toContainText('7 à 15');
+ await page.getByRole('tab',{name:'العربية'}).click();await phone.fill('0555123456');await page.getByRole('button',{name:'راجع الإجابات',exact:true}).click();await page.getByRole('button',{name:'أكّد الإجابات',exact:true}).click();
+ calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);expect(calls).toHaveLength(1);expect(JSON.parse(calls[0][1]).answers.Q15).toBe('0555123456');
 });

@@ -72,6 +72,7 @@ export function SurveyApp() {
  };
  const summary=(q:Question,answers:Answers):React.ReactNode=>{
   const v=answers[q.id];
+  if(q.type==='tel'&&!String(v??'').trim())return <span className="review-answer">{c('notProvided')}</span>;
   if(q.type==='location')return <div className="review-grid">{(['region','wilaya','commune'] as const).map(key=><div key={key}><span>{c(key)}</span><bdi>{(v as Record<string,string>)[key]}</bdi></div>)}</div>;
   if(q.type==='sku')return <bdi>{skus.find(s=>s.id===v)?.name}</bdi>;
   if(q.type==='stock'||q.type==='substitution')return <div className="review-grid">{Object.entries(v as Record<string,string>).filter(([,x])=>x).map(([key,val])=>{
