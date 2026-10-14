@@ -47,8 +47,8 @@ test('question codes, choice counts and SKU ranks preserve the workbook with req
  const fixture=JSON.parse(await readFile(new URL('./fixtures/questionnaire.json',import.meta.url),'utf8'));
  for(const [mode,sections] of [['consumer',consumerSections],['retailer',retailerSections]] as const){
   const questions=sections.flatMap(s=>s.questions);
-  assert.deepEqual(questions.filter(q=>q.id!=='Q0').map(q=>q.id).sort(),fixture[mode].filter((q:{id:string})=>!['Q13','Q14'].includes(q.id)).map((q:{id:string})=>q.id).sort());
-  for(const q of fixture[mode])if(q.choiceCount&&!['Q13','Q14'].includes(q.id))assert.equal(questions.find(x=>x.id===q.id)?.options?.length,q.id==='R2'?2:q.choiceCount,q.id);
+  assert.deepEqual(questions.filter(q=>!['Q0','Q15'].includes(q.id)).map(q=>q.id).sort(),fixture[mode].map((q:{id:string})=>q.id).sort());
+  for(const q of fixture[mode])if(q.choiceCount)assert.equal(questions.find(x=>x.id===q.id)?.options?.length,q.id==='R2'?2:q.choiceCount,q.id);
  }
  const normalized=(name:string)=>name.replace('Filsters','Filters').trim();
  assert.deepEqual(skus.map(s=>s.name),fixture.skus.map(normalized));
@@ -63,13 +63,13 @@ test('substitution export removes stale Other text while preserving an active se
 });
 
 
-test('JSON exports direct English answers and excludes removed fields',()=>{
+test('JSON exports direct English answers including restored customer demographics',()=>{
  const answers:Answers={Q1:'mbo-red',Q2:'both',Q2b:'other','Q2b-other':'Occasion',Q5:'later',Q13:'male',Q14:'1'};
  const result=literalAnswers('consumer',answers);
  assert.equal(result.Q1,'MBO Red');
  assert.equal(result.Q2,question('Q2').options!.find(o=>o.id==='both')!.label.en);
  assert.equal(result.Q2b,question('Q2b').options!.find(o=>o.id==='other')!.label.en+' — Occasion');
- assert.equal(result.Q5,'Will buy later');assert.ok(!('Q13' in result));assert.ok(!('Q14' in result));
+ assert.equal(result.Q5,'Will buy later');assert.equal(result.Q13,'Male');assert.equal(result.Q14,'25-34');
  const parsed=JSON.parse(interviewsJson([{id:'test',mode:'consumer',language:'en',completedAt:'2026-10-09T10:00:00Z',schemaVersion:1,answers,questionLanguages:{Q2:'en'}}]));
  assert.equal(parsed[0].answers.Q2,'Both pack and stick');assert.equal(parsed[0].questionLanguages,undefined);
  assert.ok(isQuestionLanguages({Q2:'en'}));assert.ok(!isQuestionLanguages({Q2:'bad'}));
@@ -138,4 +138,27 @@ test('payload answers are identical for French, English and Arabic interviews',(
   if(mode==='consumer'){assert.equal(outputs[0].answers.Q2,'Both pack and stick');assert.deepEqual(outputs[0].answers.Q8,['Only available option','Similar taste / strength']);}
   else {assert.equal(outputs[0].answers.R2,'Tobacco specialist');assert.equal((outputs[0].answers.R3 as Record<string,string>)['Camel Filters Yellow'],'Available only by stick');assert.deepEqual((outputs[0].answers.R8 as Record<string,unknown>)['MBO Red'],{primary:'No clear substitute / leaves without buying',secondary:'Other brand, specify — ماركة محلية'});}
  }
+});
+
+
+test('consumer phone is optional, validates entered numbers, and preserves leading zeroes in JSON',()=>{
+ const phone=question('Q15');assert.ok(phone);assert.ok(!retailerSections.flatMap(s=>s.questions).some(q=>q.id==='Q15'));
+ for(const value of [undefined,'','   ']){
+  const answers={Q15:value} as Answers;assert.ok(questionValid(phone,answers));assert.ok(!('Q15' in cleanAnswers('consumer',answers)));assert.ok(!('Q15' in literalAnswers('consumer',answers)));
+ }
+ for(const value of ['0555123456','+213 555 123 456','(0555) 12-34-56'])assert.ok(questionValid(phone,{Q15:value}));
+ for(const value of ['abc','123','+1234567890123456','1234567abc',{},[]])assert.ok(!questionValid(phone,{Q15:value} as Answers));
+ assert.equal(cleanAnswers('consumer',{Q15:' 0555123456 '}).Q15,'0555123456');
+ const payload=interviewPayload({id:'phone',mode:'consumer',language:'ar',completedAt:'2026-10-14T10:00:00Z',participation:{answer:'yes',language:'ar'},schemaVersion:1,answers:{Q15:' +213 555 123 456 '}});
+ assert.equal(payload.answers.Q15,'+213 555 123 456');
+ const refusal=interviewPayload({id:'refusal',mode:'consumer',language:'fr',completedAt:'2026-10-14T10:00:00Z',participation:{answer:'no',language:'fr'},schemaVersion:1,answers:{Q15:'0555123456'}});
+ assert.deepEqual(refusal.answers,{});
+});
+
+
+test('customer gender and age are required while the phone remains optional',()=>{
+ for(const id of ['Q13','Q14'])assert.ok(!questionValid(question(id),{}));
+ assert.ok(questionValid(question('Q13'),{Q13:'female'}));assert.ok(questionValid(question('Q14'),{Q14:'3'}));
+ assert.ok(questionValid(question('Q15'),{}));
+ assert.ok(!retailerSections.flatMap(s=>s.questions).some(q=>['Q13','Q14'].includes(q.id)));
 });

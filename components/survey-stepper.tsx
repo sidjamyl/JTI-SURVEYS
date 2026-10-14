@@ -5,8 +5,8 @@ import { questionValid, t, type Answers, type Language, type Section } from '@/l
 export function SurveyStepper({sections,answers,lang,activeId,finished,onSelect}:{sections:Section[];answers:Answers;lang:Language;activeId:string;finished:boolean;onSelect:(id:string)=>void}) {
  const steps=[...sections.map(s=>({id:s.id,title:s.title[lang],complete:s.questions.every(q=>questionValid(q,answers))})),{id:'review',title:t('Vérification','Review','المراجعة')[lang],complete:finished}];
  const activeIndex=steps.findIndex(s=>s.id===activeId);
- const total=sections.reduce((n,s)=>n+s.questions.length,0);
- const answered=sections.reduce((n,s)=>n+s.questions.filter(q=>questionValid(q,answers)).length,0);
+ const total=sections.reduce((n,s)=>n+s.questions.filter(q=>q.type!=='tel').length,0);
+ const answered=sections.reduce((n,s)=>n+s.questions.filter(q=>q.type!=='tel'&&questionValid(q,answers)).length,0);
  // Saving is the final step, so complete answers alone never show 100%.
  const progress=finished?100:Math.round(answered/(total+1)*100);
  return <div className="survey-stepper" dir={lang==='ar'?'rtl':'ltr'}>
