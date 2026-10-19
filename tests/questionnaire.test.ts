@@ -19,7 +19,7 @@ test('retailer substitution is capped at eight SKUs in sales rank order',()=>{
 });
 test('validation enforces integer bounds, three-answer maximum and specified Other',()=>{
  assert.ok(questionValid(question('Q7b'),{Q7b:'10'}));assert.ok(!questionValid(question('Q7b'),{Q7b:'11'}));
- assert.ok(questionValid(question('Q7a'),{Q7a:'15'}));for(const v of ['0','16','1.5','1e1',''])assert.ok(!questionValid(question('Q7a'),{Q7a:v}));
+ for(const v of ['5','10','15'])assert.ok(questionValid(question('Q7a'),{Q7a:v}));for(const v of ['0','1','4','16','5.5','1.5','1e1',''])assert.ok(!questionValid(question('Q7a'),{Q7a:v}));
  assert.ok(!questionValid(question('Q8'),{Q8:['only','closest','cheaper','taste']}));assert.ok(questionValid(question('Q8'),{Q8:['only','taste','trust']}));assert.ok(!questionValid(question('Q8'),{Q8:['trust','trust']}));
  assert.ok(!questionValid(question('Q2b'),{Q2b:'other'}));assert.ok(questionValid(question('Q2b'),{Q2b:'other','Q2b-other':'Occasion particulière'}));
 });
@@ -141,10 +141,10 @@ test('payload answers are identical for French, English and Arabic interviews',(
 });
 
 
-test('consumer phone is optional, validates entered numbers, and preserves leading zeroes in JSON',()=>{
+test('consumer phone is required, validates entered numbers, and preserves leading zeroes in JSON',()=>{
  const phone=question('Q15');assert.ok(phone);assert.ok(!retailerSections.flatMap(s=>s.questions).some(q=>q.id==='Q15'));
  for(const value of [undefined,'','   ']){
-  const answers={Q15:value} as Answers;assert.ok(questionValid(phone,answers));assert.ok(!('Q15' in cleanAnswers('consumer',answers)));assert.ok(!('Q15' in literalAnswers('consumer',answers)));
+  const answers={Q15:value} as Answers;assert.ok(!questionValid(phone,answers));assert.ok(!('Q15' in cleanAnswers('consumer',answers)));assert.ok(!('Q15' in literalAnswers('consumer',answers)));
  }
  for(const value of ['0555123456','+213 555 123 456','(0555) 12-34-56'])assert.ok(questionValid(phone,{Q15:value}));
  for(const value of ['abc','123','+1234567890123456','1234567abc',{},[]])assert.ok(!questionValid(phone,{Q15:value} as Answers));
@@ -156,9 +156,9 @@ test('consumer phone is optional, validates entered numbers, and preserves leadi
 });
 
 
-test('customer gender and age are required while the phone remains optional',()=>{
+test('customer gender, age and phone are required',()=>{
  for(const id of ['Q13','Q14'])assert.ok(!questionValid(question(id),{}));
  assert.ok(questionValid(question('Q13'),{Q13:'female'}));assert.ok(questionValid(question('Q14'),{Q14:'3'}));
- assert.ok(questionValid(question('Q15'),{}));
+ assert.ok(!questionValid(question('Q15'),{}));
  assert.ok(!retailerSections.flatMap(s=>s.questions).some(q=>['Q13','Q14'].includes(q.id)));
 });

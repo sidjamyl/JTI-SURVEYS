@@ -20,7 +20,7 @@ export async function fillToReview(page:Page,mode:Mode,overrides:Answers={}) {
   const questions=activeSections(mode,answers).flatMap(s=>s.questions);
   for(const id of ids) {
    const q=questions.find(q=>q.id===id)!;
-   const value=answers[id]??(q.type==='tel'?'':q.options?(q.type==='multi'?[q.options[0].id]:q.options[0].id):q.type==='scale'?'4':String(q.min??1));
+   const value=answers[id]??(q.type==='tel'?'0555123456':q.options?(q.type==='multi'?[q.options[0].id]:q.options[0].id):q.type==='scale'?'4':String(q.min??1));
    answers[id]=value;
    const field=page.locator(`#question-${id}`);
    if(q.type==='sku')await field.getByText(skus.find(s=>s.id===value)!.name,{exact:true}).click();
