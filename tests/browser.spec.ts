@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { beginSurvey, fillLocation, fillToReview } from './fill-survey';
+import { beginSurvey, fillLocation, fillToReview, mockCamera, takePhoto } from './fill-survey';
 test.skip(!!process.env.SURVEY_TEST_MODE,'Dedicated branch uses branch.spec.ts');
 const base=process.env.SURVEY_TEST_URL || 'http://localhost:3002';
-test.beforeEach(async({page})=>{await page.addInitScript(()=>{const w=window as typeof window & {nativeCalls:[string,string][]};w.nativeCalls=[];w.WL={Execute:(name,json)=>w.nativeCalls.push([name,json])};});});
+test.beforeEach(async({page})=>{await mockCamera(page);await page.addInitScript(()=>{const w=window as typeof window & {nativeCalls:[string,string][]};w.nativeCalls=[];w.WL={Execute:(name,json)=>w.nativeCalls.push([name,json])};});});
 test('consumer branch, switching, three-choice cap, per-question language and direct WinDev delivery',async({page})=>{
  await page.addInitScript(()=>{const w=window as typeof window & {nativeCalls:[string,string][]};w.nativeCalls=[];w.WL={Execute:(name,json)=>w.nativeCalls.push([name,json])};});
  await page.goto(base);await beginSurvey(page,'consumer');
@@ -17,11 +17,11 @@ test('consumer branch, switching, three-choice cap, per-question language and di
  await page.locator('#question-Q9 .answer-option').first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
  await page.locator('#question-Q10 .answer-option').first().click();await page.locator('#question-Q11 label').nth(3).click();await page.locator('#question-Q12 .answer-option').first().click();
  await page.getByRole('tab',{name:'العربية'}).click();await expect(page.locator('html')).toHaveAttribute('dir','rtl');await page.getByRole('tab',{name:'FR',exact:true}).click();
- await page.getByRole('button',{name:'Continuer',exact:true}).click();await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await expect(page.locator('.field-error')).toHaveCount(3);await expect(page.locator('#question-Q15 input')).toHaveValue('');await page.locator('#question-Q13 .answer-option').filter({has:page.locator('input[value=female]')}).click();await page.locator('#question-Q14 .answer-option').filter({has:page.locator('input[value="1"]')}).click();await page.locator('#question-Q15 input').fill('0555123456');
+ await page.getByRole('button',{name:'Continuer',exact:true}).click();await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await expect(page.locator('.field-error')).toHaveCount(3);await expect(page.locator('#question-Q15 input')).toHaveValue('');await page.locator('#question-Q13 .answer-option').filter({has:page.locator('input[value=female]')}).click();await page.locator('#question-Q14 .answer-option').filter({has:page.locator('input[value="1"]')}).click();await page.locator('#question-Q15 input').fill('0555123456');await takePhoto(page);
  await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();
  await page.getByRole('button',{name:'Valider les réponses',exact:true}).click();await expect(page.getByRole('button',{name:'Validé',exact:true})).toBeDisabled();await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow','100');
  const calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);expect(calls).toHaveLength(1);expect(calls[0][0]).toBe('Reponse');expect(JSON.parse(calls[0][1]).answers.Q2).toBe('Both pack and stick');
- const payload=JSON.parse(calls[0][1]);expect(payload.photo).toBeUndefined();await expect(page.locator('.consumer-photo,input[type=file],video')).toHaveCount(0);expect(payload.answers.Q8).toHaveLength(3);expect(payload.answers.Q7b).toBe('2');expect(payload.answers.Q7a).toBeUndefined();expect(payload.answers.Q13).toBe('Female');expect(payload.answers.Q14).toBe('25-34');expect(payload.answers.Q1).toBe('MBO Red');expect(payload.answers.Q2).toBe('Both pack and stick');await expect(page.locator('.success-panel')).toHaveCount(0);
+ const payload=JSON.parse(calls[0][1]);expect(payload.photo.mimeType).toBe('image/jpeg');expect(payload.answers.Q8).toHaveLength(3);expect(payload.answers.Q7b).toBe('2');expect(payload.answers.Q7a).toBeUndefined();expect(payload.answers.Q13).toBe('Female');expect(payload.answers.Q14).toBe('25-34');expect(payload.answers.Q1).toBe('MBO Red');expect(payload.answers.Q2).toBe('Both pack and stick');await expect(page.locator('.success-panel')).toHaveCount(0);
 });
 test('retailer eighteen-SKU stock grid and capped substitution route',async({page})=>{
  await page.goto(base);await beginSurvey(page,'retailer');
@@ -128,4 +128,29 @@ test('Q7a accepts only 5 to 15 sticks and bounds the quantity buttons',async({pa
  await expect(input).toHaveAttribute('min','5');await expect(input).toHaveAttribute('max','15');await expect(field.getByRole('button',{name:'−1',exact:true})).toBeDisabled();
  for(const value of ['4','16']){await input.fill(value);await page.locator('.form-navigation button[type=submit]').click();await expect(page.locator('#Q7a-error')).toBeVisible();}
  await input.fill('15');await expect(field.getByRole('button',{name:'+1',exact:true})).toBeDisabled();await page.locator('.form-navigation button[type=submit]').click();await expect(page.locator('#Q7a-error')).toHaveCount(0);
+});
+
+test('consumer requires a new camera photo, compresses it and preserves it through WinDev retry',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.addInitScript(()=>{const w=window as typeof window & {nativeCalls:[string,string][]};w.nativeCalls=[];w.WL={Execute:(name,json)=>{w.nativeCalls.push([name,json]);if(w.nativeCalls.length===1)throw new Error('Retry photo');}};});
+ await page.goto(base);await fillToReview(page,'consumer');
+ await page.locator('.review-section').filter({hasText:'Informations du client'}).getByRole('button',{name:'Modifier',exact:true}).click();
+ await expect(page.locator('input[type=file]')).toHaveCount(0);await expect(page.getByRole('button',{name:'Choisir une photo',exact:true})).toHaveCount(0);
+ await expect(page.locator('#question-Q15')).toContainText('téléphone du consommateur');
+ await page.getByRole('button',{name:'Retirer la photo',exact:true}).click();
+ await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await expect(page.locator('.consumer-photo [role=alert]')).toContainText('pour continuer');
+ await page.getByRole('button',{name:/^\d+\. Vérification/}).click();await page.getByRole('button',{name:'Valider les réponses',exact:true}).click();await expect(page.locator('.consumer-photo [role=alert]')).toBeVisible();
+ expect(await page.evaluate(()=>(window as typeof window & {nativeCalls:unknown[]}).nativeCalls.length)).toBe(0);
+ await page.evaluate(()=>{(window as typeof window & {cameraDenied:boolean}).cameraDenied=true;});
+ await page.getByRole('button',{name:'Prendre une photo',exact:true}).click();await expect(page.locator('.consumer-photo [role=alert]').first()).toContainText('Autorisez la caméra');
+ await page.evaluate(()=>{const w=window as typeof window & {cameraDenied:boolean;cameraNoise:boolean};w.cameraDenied=false;w.cameraNoise=true;});
+ await takePhoto(page);const preview=page.locator('.photo-preview img');const source=await preview.getAttribute('src');expect(source).toMatch(/^data:image\/jpeg;base64,/);expect(source!.split(',')[1].length).toBeLessThanOrEqual(256*1024);
+ expect(await preview.evaluate((img:HTMLImageElement)=>Math.max(img.naturalWidth,img.naturalHeight))).toBeLessThanOrEqual(1024);
+ expect(await page.evaluate(()=>(window as typeof window & {cameraStream:MediaStream}).cameraStream.getTracks().every(track=>track.readyState==='ended'))).toBe(true);
+ await page.setViewportSize({width:390,height:844});await page.getByRole('tab',{name:'العربية'}).click();await expect(page.locator('#consumer-photo-title')).toContainText('إجبارية');await expect(page.locator('#question-Q15')).toContainText('المستهلك');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await page.getByRole('button',{name:'راجع الإجابات',exact:true}).click();await expect(page.locator('.review-section .photo-preview img')).toBeVisible();
+ await page.getByRole('button',{name:'أكّد الإجابات',exact:true}).click();await page.getByRole('button',{name:'أعد محاولة الإرسال',exact:true}).click();
+ const calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);expect(calls).toHaveLength(2);expect(calls[0]).toEqual(calls[1]);
+ const payload=JSON.parse(calls[0][1]);expect(payload.photo.mimeType).toBe('image/jpeg');expect(payload.photo.base64.length).toBeLessThanOrEqual(256*1024);expect(Buffer.from(payload.photo.base64,'base64').subarray(0,2).toString('hex')).toBe('ffd8');
+ await page.reload();await expect(page.locator('.mode-card')).toHaveCount(2);
 });

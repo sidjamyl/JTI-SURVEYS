@@ -50,6 +50,12 @@ L’en-tête contient le logo JTI et un stepper compact pendant le questionnaire
 
 Après vérification, le bouton « Valider les réponses » transmet un entretien complet via `WL.Execute("Reponse", json)`, puis reste désactivé sur le récapitulatif. Chaque code de question contient directement sa réponse, sans intitulé ni langue. Les choix codés sont toujours exportés en anglais ; les noms de produits, wilayas et communes et les textes libres restent inchangés. Les régions sont exportées comme Central / East / West. WinDev gère la sauvegarde et la suite du parcours. En cas d’erreur du pont, le bouton permet de renvoyer le même JSON sans perdre la saisie tant que la page reste ouverte.
 
+## Photo du consommateur
+
+Uniquement sur le lien `https://jti-details.esi-maint.com` (branche `retailer`), dans le parcours Consommateur : à la fin des informations du client, une nouvelle photo du consommateur est obligatoire. Le formulaire ouvre un aperçu vidéo de la caméra, puis capture une image en direct ; aucun sélecteur de fichier ni accès à la galerie n’est proposé. La photo peut être prévisualisée, remplacée ou retirée, mais une photo reste requise pour valider. Le navigateur redessine la photo en JPEG (sans les métadonnées du fichier source), avec un côté maximal de 1 024 pixels, puis réduit la qualité et les dimensions jusqu’à obtenir au maximum 262 144 caractères Base64 (192 Kio de JPEG).
+
+La photo reste uniquement en mémoire et est transmise via le même appel WinDev dans le champ `photo: {mimeType: "image/jpeg", base64: "…"}`. Ce champ est requis pour un entretien consommateur accepté et absent pour un refus ou un entretien détaillant. La validation attend la fin de la préparation ; un réessai transmet exactement le même JSON. Le WebView WinDev cible doit autoriser la caméra et prendre en charge `getUserMedia` en HTTPS. Sans accès caméra, la validation consommateur reste bloquée. L’ouverture réelle de la caméra et la taille acceptée par le pont doivent être vérifiées sur l’appareil cible.
+
 ## Photos produit
 
 Le logo et les 18 photos fournis via Drive sont intégrés localement dans `public/brand/` et `public/products/`. Le formulaire ne dépend pas de Drive à l’exécution. Le logo original est affiché sans les marges vides de son fichier, via CSS.
