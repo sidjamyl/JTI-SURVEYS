@@ -46,6 +46,7 @@ Voir `docs/example-response.json`. Chaque code dans `answers` contient directeme
 - Q0 (consommateur) / R1 (détaillant) contiennent `{region, wilaya, commune}`, avec les wilayas et communes exactes du classeur ; la région est Central / East / West.
 - Les précisions libres restent telles que saisies ; aucune traduction automatique de texte libre n’est effectuée.
 - Q15 : téléphone consommateur obligatoire, chaîne conservant les zéros et le préfixe international. Un numéro valide est requis pour terminer le questionnaire consommateur.
+- `photo` (consommateur, facultatif) : `{ "mimeType": "image/jpeg", "base64": "/9j/…" }`, à la racine du JSON. La valeur Base64 est brute, sans préfixe `data:image/jpeg;base64,`, et limitée à 262 144 caractères (JPEG de 192 Kio maximum). Décoder cette valeur côté WinDev pour récupérer le fichier JPEG. Champ absent sans photo, pour un refus et pour le détaillant. Le JPEG est redimensionné à 1 024 pixels maximum par côté ; la qualité et les dimensions sont réduites davantage si nécessaire. Le même JSON et la même photo sont conservés en cas de réessai du pont. Tester la capture caméra et cette taille de message dans le WebView cible.
 - Q13 / Q14 : sexe (Male / Female) et tranche d’âge (19-24 / 25-34 / 35-44 / 45+) du consommateur.
 - Les réponses de branches masquées sont exclues.
 - Le pont WinDev reçoit **un seul objet**, avec les réponses de l’entretien.
