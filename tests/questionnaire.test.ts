@@ -173,3 +173,13 @@ test('R3 accepts pack-only availability and exports it in English without adding
   assert.equal((payload.answers.R3 as Record<string,string>)['MBO Red'],'Available only by pack');
  }
 });
+
+
+test('Q9 accepts the good-price choice and exports it in English for all languages',()=>{
+ const answers:Answers={Q9:'price'};assert.ok(questionValid(question('Q9'),answers));assert.equal(cleanAnswers('consumer',answers).Q9,'price');
+ assert.equal(question('Q9').options!.find(o=>o.id==='price')!.label.ar,'خاطر السعر تاعو مليح');
+ for(const language of ['fr','en','ar'] as const){
+  const payload=interviewPayload({id:'q9-price',mode:'consumer',language,completedAt:'2026-10-19T18:30:00Z',schemaVersion:1,answers});
+  assert.equal(payload.answers.Q9,'Because its price is attractive');
+ }
+});
