@@ -216,6 +216,10 @@
         "fr": "Je ne l'ai achetée que parce que mon produit habituel n'était pas disponible",
         "ar": "شريتو خاطر المنتوج اللي نشريه عادةً ما كانش متوفر."
       },
+      "price": {
+        "fr": "Parce que son prix est intéressant",
+        "ar": "خاطر السعر تاعو مليح"
+      },
       "unsure": {
         "fr": "Je ne sais pas",
         "ar": "ما علاباليش"
