@@ -28,7 +28,7 @@ export function QuestionField({question:q,answers:a,lang,set,invalid}:{question:
     <span className={`choice-mark ${q.type==='multi'?'square':''}`}>{checked&&<Check size={13}/>}</span><span><bdi>{option.label[lang]}</bdi></span>
    </label>;})}
   </div>}
-  {q.type==='tel'&&<label className="other-field"><span className="sr-only">{q.text[lang]}</span><input type="tel" inputMode="tel" autoComplete="tel" dir="ltr" maxLength={40} value={typeof value==='string'?value:''} aria-invalid={invalid} onChange={e=>set(q.id,e.target.value)}/></label>}
+  {q.type==='tel'&&<label className="other-field"><span className="sr-only">{q.text[lang]}</span><input type="tel" required inputMode="tel" autoComplete="tel" dir="ltr" maxLength={40} value={typeof value==='string'?value:''} aria-invalid={invalid} onChange={e=>set(q.id,e.target.value)}/></label>}
   {q.type==='location'&&<div className="location-fields">
    <label>{c('region')}<select value={grid.region??''} onChange={e=>set(q.id,{region:e.target.value,wilaya:'',commune:''})}><option value="">{c('select')}</option>{Object.keys(locations).map(region=><option key={region} value={region}>{region}</option>)}</select></label>
    <label>{c('wilaya')}<select disabled={!grid.region} value={grid.wilaya??''} onChange={e=>set(q.id,{...grid,wilaya:e.target.value,commune:''})}><option value="">{c('select')}</option>{Object.keys(locations[grid.region]??{}).map(wilaya=><option key={wilaya} value={wilaya}>{wilaya}</option>)}</select></label>
