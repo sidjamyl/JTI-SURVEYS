@@ -121,6 +121,16 @@ test('required customer phone blocks empty or invalid values and reaches WinDev 
  const calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);expect(calls).toHaveLength(1);expect(JSON.parse(calls[0][1]).answers.Q15).toBe('0555123456');
 });
 
+test('Q9 good-price choice is translated and reaches WinDev in English',async({page})=>{
+ await page.goto(base);await fillToReview(page,'consumer',{Q9:'price'});
+ await page.locator('.review-section').filter({has:page.locator('.review-code').filter({hasText:/^Q9$/})}).getByRole('button',{name:'Modifier',exact:true}).click();
+ for(const [language,label] of [['FR','Parce que son prix est intéressant'],['EN','Because its price is attractive'],['العربية','خاطر السعر تاعو مليح']] as const){
+  await page.getByRole('tab',{name:language,exact:true}).click();await expect(page.locator('#question-Q9 .answer-option').filter({has:page.locator('input[value=price]')})).toContainText(label);
+ }
+ await page.getByRole('tab',{name:'FR',exact:true}).click();await page.getByRole('button',{name:/^\d+\. Vérification/}).click();await page.getByRole('button',{name:'Valider les réponses',exact:true}).click();
+ const calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);expect(calls).toHaveLength(1);expect(JSON.parse(calls[0][1]).answers.Q9).toBe('Because its price is attractive');
+});
+
 test('Q7a accepts only 5 to 15 sticks and bounds the quantity buttons',async({page})=>{
  await page.goto(base);await fillToReview(page,'consumer',{Q5:'intended',Q6b:'mbo-red',Q7:'stick',Q7a:'5'});
  await page.locator('.review-section').filter({has:page.locator('.review-row').filter({hasText:'Q7a'})}).getByRole('button',{name:'Modifier',exact:true}).click();
