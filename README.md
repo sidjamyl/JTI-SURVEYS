@@ -33,7 +33,7 @@ Source : `Algeria_OOS_Questionnaire_Workbook V2_Translated_ EN FR DZ.xlsx`, four
 - Q7a : unité ou les deux, entier 5–15. Q7b : paquet ou les deux, entier 1–10.
 - Q8 : produit acheté différent de Q1, maximum trois réponses. Q11/Q12 : même condition.
 - Q9 et Q10 : posées à tous, le classeur ne mentionnant aucun saut. Ce choix littéral peut être à confirmer pour les non-acheteurs.
-- R3 : 18 statuts obligatoires. R8 : uniquement rupture ou unité, huit premières références selon le classement de ventes. « Aucun substitut / repart sans achat » est conservé ; deuxième choix facultatif et distinct du premier.
+- R3 : 18 statuts obligatoires, dont « Disponible uniquement en paquet » (`pack`, export anglais « Available only by pack »). R8 : uniquement rupture ou unité, huit premières références selon le classement de ventes. « Aucun substitut / repart sans achat » est conservé ; deuxième choix facultatif et distinct du premier.
 - R10 : uniquement si R9 indique une recommandation.
 - Les réponses masquées après modification sont conservées pendant la session, puis exclues de l’entretien final.
 - Q15 : téléphone du consommateur obligatoire, dans les informations du consommateur. La validation exige un numéro valide ; les numéros sont transmis comme chaînes, avec le zéro initial ou le préfixe international.

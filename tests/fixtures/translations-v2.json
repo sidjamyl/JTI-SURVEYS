@@ -398,6 +398,10 @@
         "fr": "Disponible en paquet entier et à l’unité",
         "ar": "متوفر بالباكي  وبالڤوارا."
       },
+      "pack": {
+        "fr": "Disponible uniquement en paquet",
+        "ar": "متوفر غير بالباكي."
+      },
       "stick": {
         "fr": "Disponible uniquement à l'unité",
         "ar": "متوفر غير بالڤوارا."
