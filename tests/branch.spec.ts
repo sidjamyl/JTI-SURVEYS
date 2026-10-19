@@ -1,10 +1,9 @@
 import { test, expect } from '@playwright/test';
 import type { Mode } from '../lib/questionnaire';
-import { beginSurvey, fillToReview, mockCamera } from './fill-survey';
+import { beginSurvey, fillToReview } from './fill-survey';
 const mode=process.env.SURVEY_TEST_MODE as Mode|undefined;
 const base=process.env.SURVEY_TEST_URL || 'http://localhost:3002';
 test.skip(!mode,'Select a mode to verify either shared deployment');
-test.beforeEach(async({page})=>{await mockCamera(page);});
 test('compact fresh survey sends JSON once and stops at review',async({page})=>{
  await page.addInitScript(()=>{
   localStorage.setItem('jti-pulse-drafts-v1',JSON.stringify({consumer:{Q1:'mbo-red',Q2:'pack'},retailer:{R2:'grocery'}}));
