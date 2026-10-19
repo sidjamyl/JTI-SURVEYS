@@ -162,3 +162,14 @@ test('customer gender, age and phone are required',()=>{
  assert.ok(!questionValid(question('Q15'),{}));
  assert.ok(!retailerSections.flatMap(s=>s.questions).some(q=>['Q13','Q14'].includes(q.id)));
 });
+
+
+test('R3 accepts pack-only availability and exports it in English without adding R8 substitutions',()=>{
+ const answers:Answers={R3:Object.fromEntries(skus.map(s=>[s.id,'pack']))};
+ assert.ok(questionValid(question('R3'),answers));assert.deepEqual(flaggedSkus(answers),[]);
+ assert.ok(!activeSections('retailer',answers).flatMap(s=>s.questions).some(q=>q.id==='R8'));
+ for(const language of ['fr','en','ar'] as const){
+  const payload=interviewPayload({id:'pack-only',mode:'retailer',language,completedAt:'2026-10-19T12:00:00Z',schemaVersion:1,answers});
+  assert.equal((payload.answers.R3 as Record<string,string>)['MBO Red'],'Available only by pack');
+ }
+});
