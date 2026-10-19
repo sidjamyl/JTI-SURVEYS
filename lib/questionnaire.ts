@@ -57,7 +57,7 @@ export const consumerSections: Section[] = [
  section('profile',t('Informations du client','Customer details','معلومات الزبون'),t('Le numéro de téléphone est obligatoire.','The phone number is required.','رقم الهاتف إجباري.'),[
   q('Q13',t('Genre','Gender','الجنس'),[o('male','Homme','Male','راجل'),o('female','Femme','Female','مرا')]),
   q('Q14',t("Tranche d’âge",'Age group','الفئة العمرية'),[o('0','19-24 ans','19-24','19-24 عام'),o('1','25-34 ans','25-34','25-34 عام'),o('2','35-44 ans','35-44','35-44 عام'),o('3','45 ans et plus','45+','45 عام وفوق')]),
-  {id:'Q15',text:t('Numéro de téléphone du client (obligatoire)','Customer phone number (required)','رقم هاتف الزبون (إجباري)'),type:'tel'},
+  {id:'Q15',text:t('Numéro de téléphone du consommateur (obligatoire)','Consumer phone number (required)','رقم هاتف المستهلك (إجباري)'),type:'tel'},
  ]),
 ];
 export const retailerSections: Section[] = [

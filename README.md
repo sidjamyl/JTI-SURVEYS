@@ -36,7 +36,7 @@ Source : `Algeria_OOS_Questionnaire_Workbook V2_Translated_ EN FR DZ.xlsx`, four
 - R3 : 18 statuts obligatoires. R8 : uniquement rupture ou unité, huit premières références selon le classement de ventes. « Aucun substitut / repart sans achat » est conservé ; deuxième choix facultatif et distinct du premier.
 - R10 : uniquement si R9 indique une recommandation.
 - Les réponses masquées après modification sont conservées pendant la session, puis exclues de l’entretien final.
-- Q15 : téléphone du client obligatoire, dans les informations du consommateur. La validation exige un numéro valide ; les numéros sont transmis comme chaînes, avec le zéro initial ou le préfixe international.
+- Q15 : téléphone du consommateur obligatoire, dans les informations du consommateur. La validation exige un numéro valide ; les numéros sont transmis comme chaînes, avec le zéro initial ou le préfixe international.
 - Q13/Q14 : sexe et tranche d’âge du consommateur rétablis, réponses obligatoires. La localisation est rétablie au début des deux parcours : Q0 consommateur / R1 détaillant, avec région, wilaya et commune. R2 propose uniquement Bureau Tabac et Kiosque.
 - `lib/locations.ts` reprend les 98 combinaisons distinctes de `Communes_List_DTC.xlsx` (3 régions, 17 wilayas). Seules les lignes exactement identiques sont dédupliquées ; les variantes orthographiques sont conservées. Les listes sont liées et les choix incompatibles sont rejetés.
 
@@ -52,9 +52,9 @@ Après vérification, le bouton « Valider les réponses » transmet un entretie
 
 ## Photo du consommateur
 
-À la fin des informations du client, une photo facultative peut être prise avec la caméra ou choisie sur l’appareil. Elle peut être prévisualisée, remplacée ou retirée avant validation. Le navigateur redessine la photo en JPEG (sans les métadonnées du fichier source), avec un côté maximal de 1 024 pixels, puis réduit la qualité et les dimensions jusqu’à obtenir au maximum 262 144 caractères Base64 (192 Kio de JPEG). Les fichiers source de plus de 20 Mio et les images illisibles sont rejetés.
+À la fin des informations du client, une nouvelle photo du consommateur est obligatoire. Le formulaire ouvre un aperçu vidéo de la caméra, puis capture une image en direct ; aucun sélecteur de fichier ni accès à la galerie n’est proposé. La photo peut être prévisualisée, remplacée ou retirée, mais une photo reste requise pour valider. Le navigateur redessine la photo en JPEG (sans les métadonnées du fichier source), avec un côté maximal de 1 024 pixels, puis réduit la qualité et les dimensions jusqu’à obtenir au maximum 262 144 caractères Base64 (192 Kio de JPEG).
 
-La photo reste uniquement en mémoire et est transmise via le même appel WinDev dans le champ `photo: {mimeType: "image/jpeg", base64: "…"}`. Ce champ est absent sans photo, pour un refus et pour le questionnaire détaillant. La validation attend la fin de la préparation ; un réessai transmet exactement le même JSON. L’ouverture réelle de la caméra et la taille acceptée par le pont doivent être vérifiées dans le WebView WinDev cible.
+La photo reste uniquement en mémoire et est transmise via le même appel WinDev dans le champ `photo: {mimeType: "image/jpeg", base64: "…"}`. Ce champ est requis pour un entretien consommateur accepté et absent pour un refus ou un entretien détaillant. La validation attend la fin de la préparation ; un réessai transmet exactement le même JSON. Le WebView WinDev cible doit autoriser la caméra et prendre en charge `getUserMedia` en HTTPS. Sans accès caméra, la validation consommateur reste bloquée. L’ouverture réelle de la caméra et la taille acceptée par le pont doivent être vérifiées sur l’appareil cible.
 
 ## Photos produit
 
