@@ -744,8 +744,8 @@
     "workbookId": null,
     "source": "Requested optional customer phone",
     "text": {
-      "fr": "Numéro de téléphone du client (facultatif)",
-      "ar": "رقم هاتف الزبون (اختياري)"
+      "fr": "Numéro de téléphone du client (obligatoire)",
+      "ar": "رقم هاتف الزبون (إجباري)"
     }
   },
   "Q13": {

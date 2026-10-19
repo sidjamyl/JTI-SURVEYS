@@ -17,7 +17,7 @@ test('consumer branch, switching, three-choice cap, per-question language and di
  await page.locator('#question-Q9 .answer-option').first().click();await page.getByRole('button',{name:'Continuer',exact:true}).click();
  await page.locator('#question-Q10 .answer-option').first().click();await page.locator('#question-Q11 label').nth(3).click();await page.locator('#question-Q12 .answer-option').first().click();
  await page.getByRole('tab',{name:'العربية'}).click();await expect(page.locator('html')).toHaveAttribute('dir','rtl');await page.getByRole('tab',{name:'FR',exact:true}).click();
- await page.getByRole('button',{name:'Continuer',exact:true}).click();await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await expect(page.locator('.field-error')).toHaveCount(2);await expect(page.locator('#question-Q15 input')).toHaveValue('');await page.locator('#question-Q13 input[value=female]').check({force:true});await page.locator('#question-Q14 input[value="1"]').check({force:true});
+ await page.getByRole('button',{name:'Continuer',exact:true}).click();await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await expect(page.locator('.field-error')).toHaveCount(3);await expect(page.locator('#question-Q15 input')).toHaveValue('');await page.locator('#question-Q13 input[value=female]').check({force:true});await page.locator('#question-Q14 input[value="1"]').check({force:true});await page.locator('#question-Q15 input').fill('0555123456');
  await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();
  await page.getByRole('button',{name:'Valider les réponses',exact:true}).click();await expect(page.getByRole('button',{name:'Validé',exact:true})).toBeDisabled();await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow','100');
  const calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);expect(calls).toHaveLength(1);expect(calls[0][0]).toBe('Reponse');expect(JSON.parse(calls[0][1]).answers.Q2).toBe('Both pack and stick');
@@ -108,14 +108,22 @@ test('location selectors reset dependent choices and reject missing values in an
 });
 
 
-test('optional customer phone can be omitted or corrected and reaches WinDev as a string',async({page})=>{
+test('required customer phone blocks empty or invalid values and reaches WinDev as a string',async({page})=>{
  await page.goto(base);await fillToReview(page,'consumer');
- await page.getByRole('button',{name:'Valider les réponses',exact:true}).click();
- let calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);expect(JSON.parse(calls[0][1]).answers.Q15).toBeUndefined();
- await page.reload();await fillToReview(page,'consumer');
  await page.locator('.review-section').filter({hasText:'Informations du client'}).getByRole('button',{name:'Modifier',exact:true}).click();
  const phone=page.locator('#question-Q15 input');await expect(phone).toHaveAttribute('type','tel');await expect(phone).toHaveAttribute('dir','ltr');
+ for(const [language,label] of [['FR','obligatoire'],['EN','required'],['العربية','إجباري']] as const){await page.getByRole('tab',{name:language,exact:true}).click();await expect(page.locator('#question-Q15')).toContainText(label);}
+ await page.getByRole('tab',{name:'FR',exact:true}).click();await phone.fill('');await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await expect(page.locator('#Q15-error')).toBeVisible();
  await phone.fill('abc');await page.getByRole('button',{name:'Vérifier les réponses',exact:true}).click();await expect(page.locator('#Q15-error')).toContainText('7 à 15');
  await page.getByRole('tab',{name:'العربية'}).click();await phone.fill('0555123456');await page.getByRole('button',{name:'راجع الإجابات',exact:true}).click();await page.getByRole('button',{name:'أكّد الإجابات',exact:true}).click();
- calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);expect(calls).toHaveLength(1);expect(JSON.parse(calls[0][1]).answers.Q15).toBe('0555123456');
+ const calls=await page.evaluate(()=>(window as typeof window & {nativeCalls:[string,string][]}).nativeCalls);expect(calls).toHaveLength(1);expect(JSON.parse(calls[0][1]).answers.Q15).toBe('0555123456');
+});
+
+test('Q7a accepts only 5 to 15 sticks and bounds the quantity buttons',async({page})=>{
+ await page.goto(base);await fillToReview(page,'consumer',{Q5:'intended',Q6b:'mbo-red',Q7:'stick',Q7a:'5'});
+ await page.locator('.review-section').filter({has:page.locator('.review-row').filter({hasText:'Q7a'})}).getByRole('button',{name:'Modifier',exact:true}).click();
+ const field=page.locator('#question-Q7a'),input=field.locator('input');
+ await expect(input).toHaveAttribute('min','5');await expect(input).toHaveAttribute('max','15');await expect(field.getByRole('button',{name:'−1',exact:true})).toBeDisabled();
+ for(const value of ['4','16']){await input.fill(value);await page.locator('.form-navigation button[type=submit]').click();await expect(page.locator('#Q7a-error')).toBeVisible();}
+ await input.fill('15');await expect(field.getByRole('button',{name:'+1',exact:true})).toBeDisabled();await page.locator('.form-navigation button[type=submit]').click();await expect(page.locator('#Q7a-error')).toHaveCount(0);
 });

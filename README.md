@@ -30,13 +30,13 @@ Source : `Algeria_OOS_Questionnaire_Workbook V2_Translated_ EN FR DZ.xlsx`, four
 - Les sections se terminent avant un embranchement ; les questions multiréponses terminent aussi leur section.
 - Q2b : uniquement si Q2 = les deux formats.
 - Q6b/Q7 : uniquement si Q5 indique un achat, y compris une autre catégorie, conformément au routage du classeur.
-- Q7a : unité ou les deux, entier 1–15. Q7b : paquet ou les deux, entier 1–10.
+- Q7a : unité ou les deux, entier 5–15. Q7b : paquet ou les deux, entier 1–10.
 - Q8 : produit acheté différent de Q1, maximum trois réponses. Q11/Q12 : même condition.
 - Q9 et Q10 : posées à tous, le classeur ne mentionnant aucun saut. Ce choix littéral peut être à confirmer pour les non-acheteurs.
 - R3 : 18 statuts obligatoires. R8 : uniquement rupture ou unité, huit premières références selon le classement de ventes. « Aucun substitut / repart sans achat » est conservé ; deuxième choix facultatif et distinct du premier.
 - R10 : uniquement si R9 indique une recommandation.
 - Les réponses masquées après modification sont conservées pendant la session, puis exclues de l’entretien final.
-- Q15 : téléphone du client facultatif, dans les informations du consommateur. Les champs vides sont omis du JSON ; les numéros sont transmis comme chaînes, avec le zéro initial ou le préfixe international.
+- Q15 : téléphone du client obligatoire, dans les informations du consommateur. La validation exige un numéro valide ; les numéros sont transmis comme chaînes, avec le zéro initial ou le préfixe international.
 - Q13/Q14 : sexe et tranche d’âge du consommateur rétablis, réponses obligatoires. La localisation est rétablie au début des deux parcours : Q0 consommateur / R1 détaillant, avec région, wilaya et commune. R2 propose uniquement Bureau Tabac et Kiosque.
 - `lib/locations.ts` reprend les 98 combinaisons distinctes de `Communes_List_DTC.xlsx` (3 régions, 17 wilayas). Seules les lignes exactement identiques sont dédupliquées ; les variantes orthographiques sont conservées. Les listes sont liées et les choix incompatibles sont rejetés.
 

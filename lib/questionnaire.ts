@@ -41,7 +41,7 @@ export const consumerSections: Section[] = [
   q('Q7',t("Et en quel format l'avez-vous acheté ?","What format did you buy?","وواشنو هو الفورما اللي شريت؟"),[o("pack","Paquet entier","Full pack","باكي"),o("stick","Cigarette à l'unité","Stick","ڤوارا"),o("both","Paquet et cigarette à l'unité","Both pack and stick","باكي و ڤوارا")],{when:purchased}),
  ]),
  section('quantity',t('Les quantités','Quantities','الكميات'),t('Combien avez-vous acheté ?','How much did you buy?','كم اشتريت؟'),[
-  {id:'Q7a',text:t("Combien de cigarettes à l'unité avez-vous achetées ?","How many sticks did you buy?","شحال من ڤوارا شريت؟"),type:'number',min:1,max:15,when:a=>purchased(a)&&['stick','both'].includes(String(a.Q7))},
+  {id:'Q7a',text:t("Combien de cigarettes à l'unité avez-vous achetées ?","How many sticks did you buy?","شحال من ڤوارا شريت؟"),type:'number',min:5,max:15,when:a=>purchased(a)&&['stick','both'].includes(String(a.Q7))},
   {id:'Q7b',text:t("Combien de paquets avez-vous achetés ?","How many packs did you buy?","شحال من باكي شريت؟"),type:'number',min:1,max:10,when:a=>purchased(a)&&['pack','both'].includes(String(a.Q7))},
  ]),
  section('drivers',t('Les raisons du choix','Choice drivers','أسباب الاختيار'),t('Ce qui a influencé votre décision.','What influenced your decision.','ما الذي أثّر في قرارك.'),[
@@ -54,10 +54,10 @@ export const consumerSections: Section[] = [
   q('Q12',t("Qu'est-ce qui vous ferait revenir à votre marque principale ?","What would make you return to your original brand?","واش اللي يقدر يخليك ترجع للماركة تاعك الاصلية؟"),[o("availability","Une meilleure disponibilité","Better availability","تكون متوفرة أكثر."),o("price","Un prix identique / stable","Same / stable price","يكون السعر نفسه و يبقى مستقر."),o("quality","Une meilleure fraîcheur / qualité","Better freshness / quality","تكون الجودة أحسن."),o("stick","Disponibilité à l'unité","Available by stick","تكون متوفرة بالڤوارا."),o("recommend","La recommandation du vendeur","Retailer recommendation","مول الحانوت ينصحني بيها."),o("return","Rien de particulier, je reviendrai de toute façon","Nothing, I will return anyway","ما كاين حتى سبب خاص، نرجعلها على كل حال."),o("stay","Rien de particulier, je pourrais continuer avec la nouvelle marque","Nothing, I may continue with the new brand","ما كاين حتى سبب خاص، ونقدر نواصل نشري الماركة الجديدة."),o("other","Autre","Other, specify","حاجة أخرى.")],{type:'multi',when:switched}),
  ]),
 
- section('profile',t('Informations du client','Customer details','معلومات الزبون'),t('Le numéro de téléphone est facultatif.','The phone number is optional.','رقم الهاتف اختياري.'),[
+ section('profile',t('Informations du client','Customer details','معلومات الزبون'),t('Le numéro de téléphone est obligatoire.','The phone number is required.','رقم الهاتف إجباري.'),[
   q('Q13',t('Genre','Gender','الجنس'),[o('male','Homme','Male','راجل'),o('female','Femme','Female','مرا')]),
   q('Q14',t("Tranche d’âge",'Age group','الفئة العمرية'),[o('0','19-24 ans','19-24','19-24 عام'),o('1','25-34 ans','25-34','25-34 عام'),o('2','35-44 ans','35-44','35-44 عام'),o('3','45 ans et plus','45+','45 عام وفوق')]),
-  {id:'Q15',text:t('Numéro de téléphone du client (facultatif)','Customer phone number (optional)','رقم هاتف الزبون (اختياري)'),type:'tel'},
+  {id:'Q15',text:t('Numéro de téléphone du client (obligatoire)','Customer phone number (required)','رقم هاتف الزبون (إجباري)'),type:'tel'},
  ]),
 ];
 export const retailerSections: Section[] = [
@@ -97,7 +97,7 @@ export function activeSections(mode: Mode, answers: Answers): Section[] {
 }
 export function questionValid(q: Question, a: Answers): boolean {
  const value=a[q.id];
- if(q.type==='tel')return value===undefined||(typeof value==='string'&&(!value.trim()||(/^\+?[0-9 ()-]+$/.test(value.trim())&&/^\d{7,15}$/.test(value.replace(/\D/g,'')))));
+ if(q.type==='tel')return typeof value==='string'&&(/^\+?[0-9 ()-]+$/.test(value.trim())&&/^\d{7,15}$/.test(value.replace(/\D/g,'')));
  if(q.type==='location') {
   if(!value||typeof value!=='object'||Array.isArray(value))return false;
   const communes=locations[value.region]?.[value.wilaya];

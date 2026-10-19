@@ -45,7 +45,7 @@ Voir `docs/example-response.json`. Chaque code dans `answers` contient directeme
 - Un refus contient `participation: "non"`, les métadonnées de l’entretien et `answers: {}`. Il passe par le même appel `Reponse` et le même mécanisme de réessai.
 - Q0 (consommateur) / R1 (détaillant) contiennent `{region, wilaya, commune}`, avec les wilayas et communes exactes du classeur ; la région est Central / East / West.
 - Les précisions libres restent telles que saisies ; aucune traduction automatique de texte libre n’est effectuée.
-- Q15 : téléphone consommateur facultatif, chaîne conservant les zéros et le préfixe international. La clé est absente lorsqu’il n’est pas renseigné.
+- Q15 : téléphone consommateur obligatoire, chaîne conservant les zéros et le préfixe international. Un numéro valide est requis pour terminer le questionnaire consommateur.
 - Q13 / Q14 : sexe (Male / Female) et tranche d’âge (19-24 / 25-34 / 35-44 / 45+) du consommateur.
 - Les réponses de branches masquées sont exclues.
 - Le pont WinDev reçoit **un seul objet**, avec les réponses de l’entretien.
