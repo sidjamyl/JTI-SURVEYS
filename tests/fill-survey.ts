@@ -1,23 +1,6 @@
 import { expect, type Page } from '@playwright/test';
 import { activeSections, skus, type Answers, type Mode } from '../lib/questionnaire';
 
-export async function mockCamera(page:Page) {
- await page.addInitScript(()=>{
-  Object.defineProperty(navigator.mediaDevices,'getUserMedia',{configurable:true,value:async()=>{
-   const flags=window as typeof window & {cameraDenied?:boolean;cameraNoise?:boolean;cameraStream?:MediaStream};
-   if(flags.cameraDenied)throw new Error('Camera denied');
-   const canvas=document.createElement('canvas');canvas.width=1600;canvas.height=1200;const ctx=canvas.getContext('2d')!;
-   if(flags.cameraNoise){const pixels=ctx.createImageData(canvas.width,canvas.height);let seed=42;for(let i=0;i<pixels.data.length;i+=4){for(let j=0;j<3;j++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;pixels.data[i+j]=seed>>>24;}pixels.data[i+3]=255;}ctx.putImageData(pixels,0,0);}else{ctx.fillStyle='#2a8855';ctx.fillRect(0,0,canvas.width,canvas.height);}
-   flags.cameraStream=canvas.captureStream(1);return flags.cameraStream;
-  }});
- });
-}
-export async function takePhoto(page:Page) {
- await page.locator('.consumer-photo').getByRole('button',{name:'Prendre une photo',exact:true}).click();
- await page.getByRole('button',{name:'Capturer la photo',exact:true}).click();
- await expect(page.locator('.consumer-photo .photo-preview img')).toBeVisible();
-}
-
 export async function fillLocation(page:Page) {
  const fields=page.locator('.location-fields select');
  await fields.nth(0).selectOption('Centre');await fields.nth(1).selectOption('ALGER');await fields.nth(2).selectOption('AIN BENIAN');
@@ -49,7 +32,6 @@ export async function fillToReview(page:Page,mode:Mode,overrides:Answers={}) {
    else if(q.type==='stock')for(const [sku,status] of Object.entries(value as Record<string,string>))await field.locator(`#stock-${sku}`).selectOption(status);
    else for(const row of await field.locator('.substitution-row').all())await row.locator('select').first().selectOption('none');
   }
-  if(mode==='consumer'&&await page.locator('.consumer-photo').count())await takePhoto(page);
   await page.locator('.form-navigation button[type=submit]').click();
   await expect(page.locator('.field-error')).toHaveCount(0);
   if(await page.locator('.review-row').count())return;
