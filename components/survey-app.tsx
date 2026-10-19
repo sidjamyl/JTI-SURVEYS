@@ -7,7 +7,7 @@ import AnimatedTabs from '@/components/smoothui/animated-tabs';
 import { AnimatedGroup } from '@/components/tailark/animated-group';
 import { SurveyStepper } from '@/components/survey-stepper';
 import { ConsumerPhotoField } from '@/components/consumer-photo';
-import type { ConsumerPhoto } from '@/lib/photo';
+import { isConsumerPhoto, type ConsumerPhoto } from '@/lib/photo';
 import { QuestionField } from '@/components/question-field';
 import { copy } from '@/lib/copy';
 import { t, activeSections, cleanAnswers, questionValid, skus, stockOptions, type Answers, type Answer, type Language, type Mode, type Question } from '@/lib/questionnaire';
@@ -64,13 +64,15 @@ export function SurveyApp() {
   submit({id:crypto.randomUUID(),mode,language:lang,completedAt:new Date().toISOString(),answers:{},participation:response,schemaVersion:1});
   navigate('declined');
  };
- const next=()=>{if(photoBusy)return;if(mode==='consumer'&&!eligible){setGateError(true);return;}const bad=current.questions.filter(q=>!questionValid(q,a)).map(q=>q.id);setInvalid(bad);if(bad.length){document.getElementById(`question-${bad[0]}`)?.scrollIntoView({behavior:'smooth',block:'center'});return;}if(sectionIndex<sections.length-1)setActiveId(sections[sectionIndex+1].id);else navigate('review');};
+ const requirePhoto=()=>{if(mode!=='consumer'||isConsumerPhoto(photo))return false;setActiveId('profile');setInvalid(['photo']);setView('survey');return true;};
+ const next=()=>{if(photoBusy)return;if(mode==='consumer'&&!eligible){setGateError(true);return;}const bad=current.questions.filter(q=>!questionValid(q,a)).map(q=>q.id);setInvalid(bad);if(bad.length){document.getElementById(`question-${bad[0]}`)?.scrollIntoView({behavior:'smooth',block:'center'});return;}if(sectionIndex<sections.length-1)setActiveId(sections[sectionIndex+1].id);else if(!requirePhoto())navigate('review');};
  const confirm=()=>{
   if(sentRef.current||photoBusy)return;
   if(participation?.answer!=='yes'){setView('intro');return;}
   if(mode==='consumer'&&!eligible){setGateError(true);setActiveId(sections[0].id);setView('survey');return;}
   const bad=sections.find(s=>s.questions.some(q=>!questionValid(q,a)));
   if(bad){setActiveId(bad.id);setInvalid(bad.questions.filter(q=>!questionValid(q,a)).map(q=>q.id));setView('survey');return;}
+  if(requirePhoto())return;
   const record=pending.current??{id:crypto.randomUUID(),mode,language:lang,completedAt:new Date().toISOString(),answers:cleanAnswers(mode,a),...(mode==='consumer'&&photo?{photo}:{}),questionLanguages,participation,schemaVersion:1 as const};
   submit(record);
  };
@@ -111,7 +113,7 @@ export function SurveyApp() {
    {view==='survey'&&<div className="form-sheet"><form onSubmit={e=>{e.preventDefault();next();}} noValidate>
     {mode==='consumer'&&sectionIndex===0&&<div className="question"><label className={`eligibility ${gateError?'invalid':''}`}><input type="checkbox" checked={eligible} onChange={e=>{setEligible(e.target.checked);setGateError(false);}}/><span>{c('gate')}</span></label>{gateError&&<p className="field-error" role="alert">{c('eligibility')}</p>}</div>}
     {current.questions.map(q=><QuestionField key={q.id} question={q} answers={a} lang={lang} set={setAnswer} invalid={invalid.includes(q.id)}/>)}
-    {mode==='consumer'&&current.id==='profile'&&<ConsumerPhotoField photo={photo} lang={lang} onChange={setPhoto} onBusy={setPhotoBusy}/>}
+    {mode==='consumer'&&current.id==='profile'&&<ConsumerPhotoField photo={photo} lang={lang} onChange={value=>{setPhoto(value);setInvalid(ids=>ids.filter(id=>id!=='photo'));}} onBusy={setPhotoBusy} invalid={invalid.includes('photo')}/>}
     <div className="form-navigation">{sectionIndex>0&&<Button type="button" variant="ghost" onClick={()=>{setActiveId(sections[sectionIndex-1].id);setInvalid([]);}}><ArrowLeft className="directional"/>{c('back')}</Button>}<Button type="submit" disabled={photoBusy} size="lg" className="primary-button">{sectionIndex===sections.length-1?c('review'):c('next')}<ArrowRight className="directional"/></Button></div>
    </form></div>}
    {view==='review'&&<><div className="review-sections">{sections.map(s=><section className="review-section" key={s.id}><header><h2>{s.title[lang]}</h2>{!pending.current&&<Button variant="ghost" onClick={()=>{setActiveId(s.id);navigate('survey');}}>{c('edit')}<ArrowUpRight size={14}/></Button>}</header>{s.questions.map(q=><div className="review-row" key={q.id}><div><bdi className="review-code">{q.id}</bdi><p>{q.text[lang]}</p></div><div>{summary(q,a)}</div></div>)}</section>)}</div>
