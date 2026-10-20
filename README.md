@@ -105,6 +105,10 @@ Le workflow `.github/workflows/pages.yml` compile et publie automatiquement `mai
 
 Les tests navigateur acceptent `SURVEY_TEST_URL` pour vérifier la version déployée.
 
+## Accès au lien consommateur
+
+Sur `https://jti-consumer.esi-maint.com/`, les deux modes restent disponibles. Sur `https://jti-consumer.esi-maint.com/0`, le bouton Détaillant reste visible, grisé et flouté, mais il est désactivé dès le HTML initial. Seul le parcours Consommateur peut être ouvert depuis cette page. Cette route est propre à la branche `consumer` ; le lien retailer conserve son fonctionnement et sa photo du consommateur.
+
 ## Versions dédiées et WinDev Mobile
 
 Les branches `consumer` et `retailer` servent le même formulaire avec choix de parcours, avec un Dockerfile complet pour Dokploy. Le pont reprend `WL.Execute` du dépôt Camel : à la validation finale, `Reponse(json)` reçoit un entretien avec les réponses en clair en anglais. `window.reponse()` permet aussi la lecture depuis WinDev. Voir [le flow WinDev](docs/WINDEV.md), [les réglages Dokploy](docs/DOKPLOY.md) et [un exemple JSON](docs/example-response.json).

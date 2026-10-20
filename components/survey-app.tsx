@@ -13,7 +13,7 @@ import { type QuestionLanguages, type Interview, type Participation } from '@/li
 import { publishResponse } from '@/lib/windev';
 
 type View='home'|'intro'|'survey'|'review'|'declined';
-export function SurveyApp() {
+export function SurveyApp({consumerOnly=false}:{consumerOnly?:boolean}) {
  const [lang,setLang]=useState<Language>('fr');
  const [mode,setMode]=useState<Mode>('consumer');
  const [view,setView]=useState<View>('home');
@@ -46,7 +46,7 @@ export function SurveyApp() {
  useEffect(()=>{window.scrollTo({top:0,behavior:'instant'});heading.current?.focus();},[activeId,view]);
  const setAnswer=(id:string,value:Answer)=>{setAnswers(d=>({...d,[id]:value}));setQuestionLanguages(l=>({...l,[id.replace('-other','')]:lang}));setInvalid(v=>v.filter(x=>x!==id&&x!==id.replace('-other','')));};
  const navigate=(v:View)=>{setView(v);setInvalid([]);};
- const start=(selected:Mode)=>{setMode(selected);setAnswers({});setQuestionLanguages({});setParticipation(null);setEligible(false);setGateError(false);setBridgeError(false);setSent(false);sentRef.current=false;pending.current=null;setActiveId('location');navigate('intro');};
+ const start=(selected:Mode)=>{if(consumerOnly&&selected==='retailer')return;setMode(selected);setAnswers({});setQuestionLanguages({});setParticipation(null);setEligible(false);setGateError(false);setBridgeError(false);setSent(false);sentRef.current=false;pending.current=null;setActiveId('location');navigate('intro');};
  const submit=(record:Interview)=>{
   if(sentRef.current)return;
   pending.current??=record;
@@ -95,7 +95,7 @@ export function SurveyApp() {
    </div>
    {view==='home'&&<section className="start-section welcome-panel">
     <p className="welcome-eyebrow">{c('fieldwork')}</p><p className="welcome-hint">{c('chooseHint')}</p>
-    <AnimatedGroup preset="fade" className="mode-cards">{(['consumer','retailer'] as Mode[]).map(m=>{const Icon=m==='consumer'?Users:Store;return <button key={m} className="mode-card" onClick={()=>start(m)}><span className="mode-icon"><Icon size={28} strokeWidth={1.6}/></span><div className="mode-title"><h2>{c(m)}</h2><span>{c(m==='consumer'?'consumerHint':'retailerHint')}</span></div><ArrowUpRight className="mode-arrow directional" size={22}/></button>;})}</AnimatedGroup>
+    <AnimatedGroup preset="fade" className="mode-cards">{(['consumer','retailer'] as Mode[]).map(m=>{const Icon=m==='consumer'?Users:Store;return <button key={m} className="mode-card" disabled={consumerOnly&&m==='retailer'} onClick={()=>start(m)}><span className="mode-icon"><Icon size={28} strokeWidth={1.6}/></span><div className="mode-title"><h2>{c(m)}</h2><span>{c(m==='consumer'?'consumerHint':'retailerHint')}</span></div><ArrowUpRight className="mode-arrow directional" size={22}/></button>;})}</AnimatedGroup>
    </section>}
    {view==='intro'&&<section className="welcome-panel intro-panel">
     <div className="intro-badge">{mode==='consumer'?<Users size={18}/>:<Store size={18}/>}<span>{c(mode)}</span><span className="intro-duration"><Clock size={14}/><bdi>{mode==='consumer'?'3–5':'4–6'}</bdi> {c('minutes')}</span></div>
