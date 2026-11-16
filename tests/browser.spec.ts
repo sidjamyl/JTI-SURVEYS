@@ -99,7 +99,7 @@ test('invitation records refusals once, retries the same JSON, and never opens t
 });
 
 test('location selectors reset dependent choices and reject missing values in an Arabic mobile survey',async({page})=>{
- await page.setViewportSize({width:390,height:844});await page.goto(base);
+ await page.setViewportSize({width:390,height:844});await page.goto(base.replace(/\/$/,'')+'/0');
  await page.locator('.mode-card').filter({hasText:'Consommateur'}).click();await page.getByRole('button',{name:'Oui',exact:true}).click();
  await page.getByRole('button',{name:'Continuer',exact:true}).click();await expect(page.locator('.field-error[role=alert]')).toContainText('Confirmez');
  await page.locator('.eligibility input').check();await page.getByRole('button',{name:'Continuer',exact:true}).click();await expect(page.locator('#Q0-error')).toBeVisible();
@@ -141,14 +141,14 @@ test('Q7a accepts only 5 to 15 sticks and bounds the quantity buttons',async({pa
 });
 
 
-test('consumer URL keeps both modes at root and disables only retailer at /0 before and after hydration',async({page,browser})=>{
+test('consumer root disables consumer and /0 keeps its existing restriction before and after hydration',async({page,browser})=>{
  const limited=base.replace(/\/$/,'')+'/0';
  const staticPage=await browser.newPage({javaScriptEnabled:false});
- try{const response=await staticPage.goto(limited);expect(response!.status()).toBe(200);await expect(staticPage.locator('.mode-card').nth(0)).toBeEnabled();await expect(staticPage.locator('.mode-card').nth(1)).toBeDisabled();}finally{await staticPage.close();}
- await page.goto(base);await expect(page.locator('.mode-card')).toHaveCount(2);await expect(page.locator('.mode-card').nth(0)).toBeEnabled();await expect(page.locator('.mode-card').nth(1)).toBeEnabled();await page.locator('.mode-card').nth(1).click();await expect(page.locator('.intro-badge')).toContainText('Détaillant');
+ try{await staticPage.goto(base);await expect(staticPage.locator('.mode-card').nth(0)).toBeDisabled();await expect(staticPage.locator('.mode-card').nth(1)).toBeEnabled();const response=await staticPage.goto(limited);expect(response!.status()).toBe(200);await expect(staticPage.locator('.mode-card').nth(0)).toBeEnabled();await expect(staticPage.locator('.mode-card').nth(1)).toBeDisabled();}finally{await staticPage.close();}
+ await page.goto(base);await expect(page.locator('.mode-card')).toHaveCount(2);await expect(page.locator('.mode-card').nth(0)).toBeDisabled();await expect(page.locator('.mode-card').nth(0)).toHaveCSS('filter','grayscale(1) blur(1.5px)');await page.locator('.mode-card').nth(0).evaluate((button:HTMLButtonElement)=>button.click());await expect(page.locator('.intro-panel')).toHaveCount(0);await expect(page.locator('.mode-card').nth(1)).toBeEnabled();await page.locator('.mode-card').nth(1).click();await expect(page.locator('.intro-badge')).toContainText('Détaillant');
  await page.goto(limited);const retailer=page.locator('.mode-card').nth(1);await expect(retailer).toBeDisabled();await expect(retailer).toHaveCSS('filter','grayscale(1) blur(1.5px)');
  await retailer.evaluate((button:HTMLButtonElement)=>button.click());await expect(page.locator('.mode-card')).toHaveCount(2);await expect(page.locator('.intro-panel')).toHaveCount(0);
  await page.setViewportSize({width:390,height:844});await page.getByRole('tab',{name:'العربية'}).click();await expect(retailer).toBeDisabled();await expect(page.locator('html')).toHaveAttribute('dir','rtl');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.getByRole('tab',{name:'FR',exact:true}).click();await beginSurvey(page,'consumer');await expect(page.locator('#question-Q1')).toBeVisible();await page.reload();await expect(page.locator('.mode-card').nth(1)).toBeDisabled();
- await page.goto(base);await expect(page.locator('.mode-card').nth(1)).toBeEnabled();
+ await page.goto(base);await expect(page.locator('.mode-card').nth(0)).toBeDisabled();await expect(page.locator('.mode-card').nth(1)).toBeEnabled();
 });

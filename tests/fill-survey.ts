@@ -6,6 +6,7 @@ export async function fillLocation(page:Page) {
  await fields.nth(0).selectOption('Centre');await fields.nth(1).selectOption('ALGER');await fields.nth(2).selectOption('AIN BENIAN');
 }
 export async function beginSurvey(page:Page,mode:Mode) {
+ if(mode==='consumer'&&await page.locator('.mode-card').first().isDisabled())await page.goto(new URL('/0',page.url()).href);
  await page.locator('.mode-card').filter({hasText:mode==='consumer'?'Consommateur':'Détaillant'}).click();
  await page.getByRole('button',{name:'Oui',exact:true}).click();
  if(mode==='consumer')await page.locator('.eligibility input').check();
