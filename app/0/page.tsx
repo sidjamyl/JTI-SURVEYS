@@ -1,2 +1,2 @@
 import { SurveyApp } from '@/components/survey-app';
-export default function Page() { return <SurveyApp disabledMode="retailer" />; }
+export default function Page() { return <SurveyApp disabledMode="consumer" />; }

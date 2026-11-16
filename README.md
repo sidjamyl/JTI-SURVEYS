@@ -107,7 +107,7 @@ Les tests navigateur acceptent `SURVEY_TEST_URL` pour vérifier la version dépl
 
 ## Accès au lien consommateur
 
-Sur `https://jti-consumer.esi-maint.com/`, le bouton Consommateur est grisé, flouté et désactivé ; seul le parcours Détaillant est accessible depuis cette page. Sur `https://jti-consumer.esi-maint.com/0`, le bouton Détaillant reste visible, grisé et flouté, mais il est désactivé dès le HTML initial. Seul le parcours Consommateur peut être ouvert depuis cette page. Cette route est propre à la branche `consumer` ; le lien retailer conserve son fonctionnement et sa photo du consommateur.
+Sur `https://jti-consumer.esi-maint.com/` et `https://jti-consumer.esi-maint.com/0`, le bouton Consommateur est grisé, flouté et désactivé dès le HTML initial ; seul le parcours Détaillant est accessible. Cette restriction est propre à la branche `consumer` ; le lien retailer conserve son fonctionnement et sa photo du consommateur.
 
 ## Versions dédiées et WinDev Mobile
 
